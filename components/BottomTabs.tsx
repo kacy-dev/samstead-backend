@@ -13,7 +13,7 @@ function TabBarIcon(props: { name: React.ComponentProps<typeof Feather>['name'];
   return <Feather size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
-export default function TabLayout() {
+export default function BottomTabs() {
   const colorScheme = useColorScheme();
 
   return (

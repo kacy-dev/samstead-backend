@@ -113,13 +113,18 @@ const RecommendedProducts = [
         <View className="p-4 rounded-2xl mb-4 mt-[-20px]" style={{ backgroundColor: '#058044' }}>
           <Text className="text-white font-bold text-2xl mb-1">Premium Membership</Text>
           <Text className="text-white text-lg mb-4">Get exclusive deals and priority delivery</Text>
-          <TouchableOpacity className="mt-2 bg-white py-4 px-4 rounded-lg w-36">
+          <TouchableOpacity className="mt-2 bg-white py-4 px-4 rounded-lg w-36" onPress={() => router.push('/')}>
             <Text className="font-semibold text-center" style={{color: '#058044'}}>Upgrade Now</Text>
           </TouchableOpacity>
         </View>
 
         {/* Today's Deals */}
-        <Text className="text-lg font-bold mb-4 mt-4">Today's Deals</Text>
+        <View className='flex-row justify-between items-center mb-4'>
+        <Text className="text-lg font-bold mt-4">Today's Deals</Text>
+          <TouchableOpacity onPress={() => router.push({ pathname: '/AllProducts', params: { category: 'Deals' } })}>
+            <Text className="text-green-600 font-semibold text-lg mt-4">See All Products</Text>
+          </TouchableOpacity>
+        </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4 min-h-[220px]">
           {dailyDeals.map((item, index) => (
             <TouchableOpacity

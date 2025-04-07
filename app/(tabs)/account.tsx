@@ -2,8 +2,10 @@ import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView } from 'rea
 import React from 'react';
 import { Ionicons, Feather, Entypo, FontAwesome6, AntDesign, MaterialIcons } from '@expo/vector-icons';
 import colors from '@/components/colors';
+import { router } from 'expo-router';
 
 const Account = () => {
+  
   return (
     <ScrollView className='flex-1 p-4' style={{backgroundColor: '#f6f6f6'}}>
       {/* Header */}
@@ -109,10 +111,17 @@ const Account = () => {
           </View>
           <Ionicons name="chevron-forward-outline" size={18} color="#4B5563" />
         </TouchableOpacity>
-        <TouchableOpacity className='flex-row justify-between items-center mb-2'>
+        <TouchableOpacity className='flex-row justify-between items-center mb-8'>
           <View className='flex-row items-center gap-4'>
             <MaterialIcons name="my-library-books" size={20} color="#4B5563" />
             <Text className='font-bold'>Terms & Conditions</Text>
+          </View>
+          <Ionicons name="chevron-forward-outline" size={18} color="#4B5563" />
+        </TouchableOpacity>
+        <TouchableOpacity className='flex-row justify-between items-center mb-2' onPress={() => router.replace('/Onboarding')}>
+          <View className='flex-row items-center gap-4'>
+            <MaterialIcons name="lock" size={20} color="red" />
+            <Text className='font-bold' style={{color: 'red'}}>Log Out</Text>
           </View>
           <Ionicons name="chevron-forward-outline" size={18} color="#4B5563" />
         </TouchableOpacity>

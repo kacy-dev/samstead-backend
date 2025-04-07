@@ -9,10 +9,10 @@ const Header = () => {
   const navigation = useNavigation();
 
   return (
-    <View className="flex-row items-center justify-between mb-2 mt-8">
+    <View className="flex-row items-center justify-between mb-2 mt-12">
       <Image
-        source={require('@/assets/images/logo.png')}
-        className="w-16 h-16 rounded-full"
+        source={require('@/assets/icons/logo.png')}
+        className="w-36 h-16 rounded-full"
         resizeMode="contain"
       />
       <View className="flex-row items-center justify-end  gap-4">

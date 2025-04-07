@@ -4,6 +4,7 @@ import { Ionicons, Feather, Entypo, FontAwesome, AntDesign } from '@expo/vector-
 import { useProductStore } from '@/store/useProductStore';
 import Toast from 'react-native-root-toast';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
+import { useFavoriteStore } from '../store/useFavoriteStore'; // adjust path if needed
 
 
 const products = [
@@ -147,6 +148,90 @@ const products = [
     vitaminC: '100mg',
     category: 'Meat',
   },
+  {
+    name: 'Potatoes',
+    price: '6700',
+    oldPrice: '',
+    weight: '500',
+    image: require('@/assets/products/2.png'),
+    description:
+      'Premium organic tomatoes sourced directly from local Nigerian farms. These vine-ripened tomatoes are carefully selected for their superior taste and quality. Perfect for salads, cooking, or making fresh sauce.',
+    calories: '22 Kcal/100g',
+    protein: '1.1g',
+    carbohydrates: '10g',
+    vitaminC: '100mg',
+    category: 'Pantry Staples',
+  },
+  {
+    name: 'Potatoes',
+    price: '6700',
+    oldPrice: '',
+    weight: '500',
+    image: require('@/assets/products/3.png'),
+    description:
+      'Premium organic tomatoes sourced directly from local Nigerian farms. These vine-ripened tomatoes are carefully selected for their superior taste and quality. Perfect for salads, cooking, or making fresh sauce.',
+    calories: '22 Kcal/100g',
+    protein: '1.1g',
+    carbohydrates: '10g',
+    vitaminC: '100mg',
+    category: 'Beverages',
+  },
+    {
+    name: 'Potatoes',
+    price: '6700',
+    oldPrice: '',
+    weight: '500',
+    image: require('@/assets/products/2.png'),
+    description:
+      'Premium organic tomatoes sourced directly from local Nigerian farms. These vine-ripened tomatoes are carefully selected for their superior taste and quality. Perfect for salads, cooking, or making fresh sauce.',
+    calories: '22 Kcal/100g',
+    protein: '1.1g',
+    carbohydrates: '10g',
+    vitaminC: '100mg',
+    category: 'Dairy',
+  },
+  {
+    name: 'Potatoes',
+    price: '6700',
+    oldPrice: '',
+    weight: '500',
+    image: require('@/assets/products/4.png'),
+    description:
+      'Premium organic tomatoes sourced directly from local Nigerian farms. These vine-ripened tomatoes are carefully selected for their superior taste and quality. Perfect for salads, cooking, or making fresh sauce.',
+    calories: '22 Kcal/100g',
+    protein: '1.1g',
+    carbohydrates: '10g',
+    vitaminC: '100mg',
+    category: 'Dairy & Eggs',
+  },
+  {
+    name: 'Potatoes',
+    price: '6700',
+    oldPrice: '',
+    weight: '500',
+    image: require('@/assets/products/9.png'),
+    description:
+      'Premium organic tomatoes sourced directly from local Nigerian farms. These vine-ripened tomatoes are carefully selected for their superior taste and quality. Perfect for salads, cooking, or making fresh sauce.',
+    calories: '22 Kcal/100g',
+    protein: '1.1g',
+    carbohydrates: '10g',
+    vitaminC: '100mg',
+    category: 'Dairy & Eggs',
+  },
+  {
+    name: 'Potatoes',
+    price: '6700',
+    oldPrice: '',
+    weight: '500',
+    image: require('@/assets/products/11.png'),
+    description:
+      'Premium organic tomatoes sourced directly from local Nigerian farms. These vine-ripened tomatoes are carefully selected for their superior taste and quality. Perfect for salads, cooking, or making fresh sauce.',
+    calories: '22 Kcal/100g',
+    protein: '1.1g',
+    carbohydrates: '10g',
+    vitaminC: '100mg',
+    category: 'Dairy & Eggs',
+  },
 ];
 
 const ProductList = () => {
@@ -155,51 +240,53 @@ const ProductList = () => {
   const cart = useProductStore((state) => state.cart);
   const filteredProducts = products.filter((item) => item.category === category);
 
-  
+  const favorites = useFavoriteStore((state) => state.favorites);
+  const toggleFavorite = useFavoriteStore((state) => state.toggleFavorite);
+  const isFavorited = useFavoriteStore((state) => state.isFavorited);
   
 
   return (
     <View className="flex-1" style={{ backgroundColor: '#f6f6f6' }}>
       {/* Header */}
-<View className="flex-row items-center justify-between mb-3 mt-12 p-4">
-  <View className="flex-row items-center gap-2">
-    <TouchableOpacity onPress={() => navigation.goBack()}>
-      <Ionicons name="arrow-back" size={24} color="#000" />
-    </TouchableOpacity>
-    <Text className="text-lg font-semibold text-black">
-    {category || 'Category'}
-    </Text>
-  </View>
-  
-  <View className="flex-row items-center gap-4">
-    <FontAwesome name="filter" size={24} color="#000" />
-    
-    <TouchableOpacity
-      onPress={() => navigation.navigate('Cart')}
-      style={styles.cartIconContainer}
-    >
-      <Ionicons name="cart-outline" size={28} color="black" />
-      {cart.length > 0 && (
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>{cart.length}</Text>
+        <View className="flex-row items-center justify-between mb-3 mt-12 p-4">
+          <View className="flex-row items-center gap-2">
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Ionicons name="arrow-back" size={24} color="#000" />
+            </TouchableOpacity>
+            <Text className="text-lg font-semibold text-black">
+            {category || 'Category'}
+            </Text>
+          </View>
+          
+          <View className="flex-row items-center gap-4">
+            <FontAwesome name="filter" size={24} color="#000" />
+            
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Cart')}
+              style={styles.cartIconContainer}
+            >
+              <Ionicons name="cart-outline" size={28} color="black" />
+              {cart.length > 0 && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>{cart.length}</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          </View>
         </View>
-      )}
-    </TouchableOpacity>
-  </View>
-</View>
 
 
       {/* Search Input */}
       <View className="mb-4 bg-white p-4">
         <View className='flex-row bg-gray-100 items-center p-3 rounded-lg gap-2'>
-            <AntDesign name="search1" size={20} color="#999" />
-            <TextInput
-                placeholder="Search vegetables..."
-                placeholderTextColor="#999"
-                className='flex-1'
-            />
+          <AntDesign name="search1" size={20} color="#999" />
+          <TextInput
+              placeholder="Search vegetables..."
+              placeholderTextColor="#999"
+              className='flex-1'
+          />
       </View>
-      </View>
+    </View>
 
       {/* Product Grid */}
       <ScrollView showsVerticalScrollIndicator={false} className="mb-4 p-4">
@@ -223,7 +310,9 @@ const ProductList = () => {
           <Image source={item.image} className="w-full h-20 rounded-lg mb-3 mt-2" resizeMode="contain" />
           <View className="flex-row items-center justify-between mt-2">
             <Text className="font-bold text-lg flex-1">{item.name}</Text>
-            <Ionicons name='heart-outline' size={16}/>
+            <TouchableOpacity>
+              <Ionicons name='heart-outline' size={22}/>
+            </TouchableOpacity>
           </View>
           <Text className="text-gray-500 text-lg font-semibold">{item.weight}g Pack</Text>
 
