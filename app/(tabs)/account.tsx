@@ -59,40 +59,31 @@ const account = () => {
       {/* Recent Orders */}
       <View className='mt-6 bg-white rounded-lg'>
         {/* Order Card */}
-        <View className='p-4 rounded-lg '>
+        <TouchableOpacity onPress={() => router.push('/TrackOrder')} className='p-4 rounded-lg '>
           <Text className='font-bold text-lg mb-4'>Recent Orders</Text>
-          <TouchableOpacity onPress={() => router.push('/TrackOrder')} className='p-2 rounded-lg' style={{borderWidth: 1, borderColor: '#ddd'}}>
-            <View className='flex-row justify-between items-center'>
-              <Text className='font-bold '>#ORD123456</Text>
-              <View className='bg-green-100 px-2 rounded-full' style={{padding: 2}}>
-                <Text className='text-sm font-semibold text-green-600'>Delivered</Text>
+           <View className="rounded-xl p-4 mb-4" style={{backgroundColor: '#f5f5f5'}}>
+              <View className="flex-row justify-between items-center mb-1">
+                <Text className="font-bold text-black">#ORDER2025</Text>
+                <View className="bg-yellow-200 px-2 py-1 rounded-full">
+                  <Text className="text-xs font-semibold text-yellow-800">Processing</Text>
+                </View>
               </View>
-            </View>
-          
-            <Text className='text-sm font-semibold text-gray-500'>Oct 15, 2025</Text>
-            <View className='flex-row items-center justify-between mt-4'>
-              <Text className='font-semibold text-gray-500'>12 items</Text>
-              <Text className='font-bold'>₦25,400</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-        
-        <View className='p-4 rounded-lg '>
-          <TouchableOpacity onPress={() => router.push('/TrackOrder')} className='p-2 rounded-lg' style={{borderWidth: 1, borderColor: '#ddd'}}>
-            <View className='flex-row justify-between items-center'>
-              <Text className='font-bold '>#ORD123456</Text>
-              <View className='bg-green-100 px-2 rounded-full' style={{padding: 2}}>
-                <Text className='text-sm font-semibold text-green-600'>Delivered</Text>
+              <Text className="text-gray-700 mb-1 font-semibold">Carrot</Text>
+              <View className='flex-row items-center justify-between mt-2 mb-4' style={{borderBottomWidth: 1, borderColor: '#ddd', paddingBottom: 10}}>
+                <Text className="font-semibold text-gray-500">15 items</Text>
+                <Text className="font-bold text-lg text-black">₦25,000</Text>
               </View>
+                <View className="flex-row items-center justify-between">
+                  <View className='items-center flex-row gap-2'>
+                  <MaterialCommunityIcons color={'red'} size={16} name='clock'/>
+                  <Text className="text-sm font-semibold text-red-600">Next Day Delivery</Text>
+                  </View>
+                  <TouchableOpacity>
+                    <Text className="text-medium font-semibold text-green-700">View Details</Text>
+                  </TouchableOpacity>
+                </View>
             </View>
-          
-            <Text className='text-sm font-semibold text-gray-500'>Oct 15, 2025</Text>
-            <View className='flex-row items-center justify-between mt-4'>
-              <Text className='font-semibold text-gray-500'>12 items</Text>
-              <Text className='font-bold'>₦25,400</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
 
         <TouchableOpacity className='items-center mt-4 mb-4' onPress={() => router.push('/Orders')}>
           <Text className='font-bold text-green-600'>View All Orders</Text>

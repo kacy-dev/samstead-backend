@@ -18,7 +18,7 @@ const Header = () => {
       />
       <View className="flex-row items-center justify-end  gap-4">
         <TouchableOpacity onPress={() => router.push('/Search')}>
-        <AntDesign name="search1" size={30} color="gray" />
+        <AntDesign name="search1" size={30} color="#555" />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => router.push('/Cart')}
