@@ -81,6 +81,7 @@ function RootLayoutNav({ isSplashDone }: { isSplashDone: boolean }) {
         <Stack.Screen name="ForgotPassword" options={{ headerShown: false }} />
         <Stack.Screen name="ResetPassword" options={{ headerShown: false }} />
         <Stack.Screen name="ResetOtpVerification" options={{ headerShown: false }} />
+        <Stack.Screen name="Notifications" options={{ headerShown: false }} />
         {/* Tabs group */}
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>

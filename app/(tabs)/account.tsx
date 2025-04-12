@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView } from 'react-native';
 import React from 'react';
-import { Ionicons, Feather, Entypo, FontAwesome6, AntDesign, MaterialIcons } from '@expo/vector-icons';
+import { Ionicons, Feather, Entypo, FontAwesome6, AntDesign, MaterialIcons, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import colors from '@/components/colors';
 import { router } from 'expo-router';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -16,8 +16,8 @@ const account = () => {
           <Ionicons name="arrow-back" size={24} color="#000" />
           <Text className='text-2xl font-bold'>My account</Text>
         </View>
-        <TouchableOpacity onPress={() => router.push('/Settings')}>
-          <Ionicons name="settings" size={30} color="#333" />
+        <TouchableOpacity onPress={() => router.push('/Notifications')}>
+          <MaterialCommunityIcons name="bell" size={30} color="#555" />
         </TouchableOpacity>
       </View>
 

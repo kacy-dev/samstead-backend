@@ -46,6 +46,10 @@
     },
     "updates": {
       "url": "https://u.expo.dev/92eec1f5-3319-4d24-9f1f-de3401acb792"
+    },
+    "permissions": {
+      "camera": true,
+      "cameraRoll": true
     }
   }
 }
