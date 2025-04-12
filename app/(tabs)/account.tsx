@@ -3,8 +3,10 @@ import React from 'react';
 import { Ionicons, Feather, Entypo, FontAwesome6, AntDesign, MaterialIcons } from '@expo/vector-icons';
 import colors from '@/components/colors';
 import { router } from 'expo-router';
+import { useAuthStore } from '@/store/useAuthStore';
 
-const Account = () => {
+const account = () => {
+  const logout = useAuthStore((state) => state.logout);
   
   return (
     <ScrollView className='flex-1 p-4' style={{backgroundColor: '#f6f6f6'}}>
@@ -12,9 +14,11 @@ const Account = () => {
       <View className='flex-row items-center justify-between mb-4 mt-12'>
         <View className='flex-row items-center gap-2'>
           <Ionicons name="arrow-back" size={24} color="#000" />
-          <Text className='text-2xl font-bold'>My Account</Text>
+          <Text className='text-2xl font-bold'>My account</Text>
         </View>
-        <Ionicons name="settings" size={30} color="#333" />
+        <TouchableOpacity onPress={() => router.push('/Settings')}>
+          <Ionicons name="settings" size={30} color="#333" />
+        </TouchableOpacity>
       </View>
 
       {/* Profile */}
@@ -29,7 +33,7 @@ const Account = () => {
         </View>
       </View>
 
-      <TouchableOpacity className='rounded-lg p-3 mt-4 items-center' style={{backgroundColor: colors.primary}}>
+      <TouchableOpacity className='rounded-lg p-3 mt-4 items-center' style={{backgroundColor: colors.primary}} onPress={() => router.push('/EditProfile')}>
         <Text className='text-lg text-white font-semibold'>Edit Profile</Text>
       </TouchableOpacity>
 
@@ -57,7 +61,7 @@ const Account = () => {
         {/* Order Card */}
         <View className='p-4 rounded-lg '>
           <Text className='font-bold text-lg mb-4'>Recent Orders</Text>
-          <View className='p-2 rounded-lg' style={{borderWidth: 1, borderColor: '#ddd'}}>
+          <TouchableOpacity onPress={() => router.push('/TrackOrder')} className='p-2 rounded-lg' style={{borderWidth: 1, borderColor: '#ddd'}}>
             <View className='flex-row justify-between items-center'>
               <Text className='font-bold '>#ORD123456</Text>
               <View className='bg-green-100 px-2 rounded-full' style={{padding: 2}}>
@@ -65,33 +69,34 @@ const Account = () => {
               </View>
             </View>
           
-          <Text className='text-sm font-semibold text-gray-500'>Oct 15, 2025</Text>
-          <View className='flex-row items-center justify-between mt-4'>
-            <Text className='font-semibold text-gray-500'>12 items</Text>
-            <Text className='font-bold'>₦25,400</Text>
-          </View>
-          </View>
-        </View>
-
-        <View className='p-4 rounded-lg bg-white'>
-          <View className='p-2 rounded-lg' style={{borderWidth: 1, borderColor: '#ddd'}}>
-            <View className='flex-row justify-between items-center'>
-              <Text className='font-bold '>#ORD123456</Text>
-              <View className='bg-green-100 px-2 rounded-full' style={{padding: 2}}>
-                <Text className='text-sm font-semibold text-green-600'>Delivered</Text>
-              </View>
+            <Text className='text-sm font-semibold text-gray-500'>Oct 15, 2025</Text>
+            <View className='flex-row items-center justify-between mt-4'>
+              <Text className='font-semibold text-gray-500'>12 items</Text>
+              <Text className='font-bold'>₦25,400</Text>
             </View>
-          
-          <Text className='text-sm font-semibold text-gray-500'>Oct 12, 2025</Text>
-          <View className='flex-row items-center justify-between mt-4'>
-            <Text className='font-semibold text-gray-500'>8 items</Text>
-            <Text className='font-bold'>₦18,900</Text>
-          </View>
-          </View>
-          <TouchableOpacity className='items-center mt-4'>
-            <Text className='font-bold text-green-600'>View All Orders</Text>
           </TouchableOpacity>
         </View>
+        
+        <View className='p-4 rounded-lg '>
+          <TouchableOpacity onPress={() => router.push('/TrackOrder')} className='p-2 rounded-lg' style={{borderWidth: 1, borderColor: '#ddd'}}>
+            <View className='flex-row justify-between items-center'>
+              <Text className='font-bold '>#ORD123456</Text>
+              <View className='bg-green-100 px-2 rounded-full' style={{padding: 2}}>
+                <Text className='text-sm font-semibold text-green-600'>Delivered</Text>
+              </View>
+            </View>
+          
+            <Text className='text-sm font-semibold text-gray-500'>Oct 15, 2025</Text>
+            <View className='flex-row items-center justify-between mt-4'>
+              <Text className='font-semibold text-gray-500'>12 items</Text>
+              <Text className='font-bold'>₦25,400</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity className='items-center mt-4 mb-4' onPress={() => router.push('/Orders')}>
+          <Text className='font-bold text-green-600'>View All Orders</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Support */}
@@ -130,4 +135,4 @@ const Account = () => {
   );
 };
 
-export default Account;
+export default account;

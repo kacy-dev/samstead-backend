@@ -7,7 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';  // Ensure the dependency is installed
 import { push } from 'expo-router/build/global-state/routing';
 
-const LoginScreen = () => {
+const ResetPassword = () => {
   const navigation = useNavigation();
   const [isChecked, setIsChecked] = useState(false);
   const [email, setEmail] = useState('');
@@ -73,28 +73,16 @@ const LoginScreen = () => {
       </View>
 
       {/* Heading */}
-      <Text className="text-2xl font-bold mb-1 text-center">Welcome Back</Text>
-      <Text className="text-gray-500 text-lg font-semibold text-center mb-8">Login to your account</Text>
+      <Text className="text-2xl font-bold mb-1 text-center">Reset Your Password</Text>
+      <Text className="text-gray-500 text-lg font-semibold text-center mb-8">Enter New Password</Text>
 
 
       {/* Password */}
-      <Text className='text-lg text-gray-600 font-semibold mb-2'>Email or Phone Number</Text>
-      <View className='flex-row gap-4 items-center border border-gray-300 rounded-lg px-4 py-4 mb-4'>
-        <AntDesign name='mail' size={18}/>
-        <TextInput
-          placeholder="Enter your email or phone"
-          placeholderTextColor="gray"
-          className="flex-1"
-          value={email}
-          onChangeText={setEmail}
-        />
-      </View>
-
-      <Text className='text-lg text-gray-600 font-semibold mb-2'>Password</Text>
+      <Text className='text-lg text-gray-600 font-semibold mb-2'>New Password</Text>
       <View className='flex-row gap-4 items-center border border-gray-300 rounded-lg px-4 py-3 mb-4'>
         <FontAwesome name='lock' color={'#666'} size={20}/>
         <TextInput
-          placeholder="Create a password"
+          placeholder="Create new password"
           secureTextEntry
           className="flex-1"
           placeholderTextColor="gray"
@@ -102,27 +90,26 @@ const LoginScreen = () => {
           onChangeText={setPassword}
         />
       </View>
-      <View className="flex-row justify-between items-center mb-6 mt-4">
-      <Pressable
-        onPress={() => setIsChecked(!isChecked)}
-        className="flex-row items-center"
-      >
-        <View className="w-5 h-5 border border-gray-400 rounded mr-2 items-center justify-center bg-white">
-          {isChecked && <Ionicons name="checkmark" size={14} color="green" />}
-        </View>
-        <Text className="text-gray-500 text-lg font-semibold">Remember me</Text>
-      </Pressable>
 
-      <TouchableOpacity onPress={() => router.push('/ForgotPassword')}>
-      <Text className="text-green-600 text-lg font-semibold">Forgot password?</Text>
-      </TouchableOpacity>
-    </View>
+      <Text className='text-lg text-gray-600 font-semibold mb-2'>Confirm New Password</Text>
+      <View className='flex-row gap-4 items-center border border-gray-300 rounded-lg px-4 py-3 mb-4'>
+        <FontAwesome name='lock' color={'#666'} size={20}/>
+        <TextInput
+          placeholder="Confirm new password"
+          secureTextEntry
+          className="flex-1"
+          placeholderTextColor="gray"
+          value={password}
+          onChangeText={setPassword}
+        />
+      </View>
+      
 
       {/* Create Account Button */}
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : (
-      <TouchableOpacity className="py-4 rounded-lg mb-6" style={{ backgroundColor: colors.primary }}  onPress={() => router.push('/(tabs)')}>
+      <TouchableOpacity className="py-4 rounded-lg mb-6" style={{ backgroundColor: colors.primary }}  onPress={() => router.push('/LoginScreen')}>
         <Text className="text-white text-center text-lg font-semibold text-base">Login</Text>
       </TouchableOpacity>
       )}
@@ -130,12 +117,12 @@ const LoginScreen = () => {
 
       {/* Login Link */}
       <Text className="text-center text-lg font-semibold text-gray-500">
-        Don't have an account?{' '}
+        Already have an account?{' '}
         <Text
-          onPress={() => router.push('/SignupScreen')} // Make sure this route exists
+          onPress={() => router.push('/LoginScreen')} // Make sure this route exists
           className="text-green-700 font-semibold"
         >
-          Sign up
+          Login
         </Text>
       </Text>
       <StatusBar style="dark" backgroundColor="white" />
@@ -143,4 +130,4 @@ const LoginScreen = () => {
   );
 };
 
-export default LoginScreen;
+export default ResetPassword;

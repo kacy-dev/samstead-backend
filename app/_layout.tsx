@@ -7,6 +7,9 @@ import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
 import "../global.css";
 import { useColorScheme } from '@/components/useColorScheme';
+import { useAuthStore } from '@/store/useAuthStore';
+import { RootSiblingParent } from 'react-native-root-siblings';
+import Toast from 'react-native-toast-message';
 
 SplashScreen.preventAutoHideAsync(); // Keep splash visible until fonts are loaded
 
@@ -16,29 +19,42 @@ export default function RootLayout() {
     ...FontAwesome.font,
   });
 
-  const [isSplashDone, setIsSplashDone] = useState(false); // Track if splash is finished
+  const [isAppReady, setIsAppReady] = useState(false);
+  const loadAuth = useAuthStore((state) => state.loadAuth);
+
+  useEffect(() => {
+    async function prepareApp() {
+      try {
+        await loadAuth(); // Wait for auth to load
+      } catch (e) {
+        console.error("Error loading auth:", e);
+      } finally {
+        setIsAppReady(true); // Mark app ready only after auth and fonts
+        SplashScreen.hideAsync();
+      }
+    }
+
+    if (loaded) {
+      prepareApp();
+    }
+  }, [loaded]);
 
   useEffect(() => {
     if (error) throw error;
   }, [error]);
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync(); // Hide splash screen when fonts are loaded
-      setIsSplashDone(true); // Mark splash as done
-    }
-  }, [loaded]);
+  if (!loaded || !isAppReady) return null; // Block UI until ready
 
-  if (!loaded) return null; // Don't render anything until fonts are loaded
-
-  return <RootLayoutNav isSplashDone={isSplashDone} />;
+  return <RootLayoutNav isSplashDone={false} />;
 }
+
 
 function RootLayoutNav({ isSplashDone }: { isSplashDone: boolean }) {
   const colorScheme = useColorScheme();
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <RootSiblingParent>
       <Stack initialRouteName={isSplashDone ? "(tabs)" : "Splash"}>
         {/* Splash Screen as initial route */}
         <Stack.Screen name="Splash" options={{ headerShown: false }} />
@@ -52,10 +68,26 @@ function RootLayoutNav({ isSplashDone }: { isSplashDone: boolean }) {
         <Stack.Screen name="ProductList" options={{ headerShown: false }} />
         <Stack.Screen name="AllProducts" options={{ headerShown: false }} />
         <Stack.Screen name="OtpVerification" options={{ headerShown: false }} />
-
+        <Stack.Screen name="Checkout" options={{ headerShown: false }} />
+        <Stack.Screen name="Success" options={{ headerShown: false }} />
+        <Stack.Screen name="TrackOrder" options={{ headerShown: false }} />
+        <Stack.Screen name="Pricing" options={{ headerShown: false }} />
+        <Stack.Screen name="CheckoutScreen" options={{ headerShown: false }} />
+        <Stack.Screen name="Settings" options={{ headerShown: false }} />
+        <Stack.Screen name="Orders" options={{ headerShown: false }} />
+        <Stack.Screen name="EditProfile" options={{ headerShown: false }} />
+        <Stack.Screen name="Search" options={{ headerShown: false }} />
+        <Stack.Screen name="SubscriptionSuccess" options={{ headerShown: false }} />
+        <Stack.Screen name="ForgotPassword" options={{ headerShown: false }} />
+        <Stack.Screen name="ResetPassword" options={{ headerShown: false }} />
+        <Stack.Screen name="ResetOtpVerification" options={{ headerShown: false }} />
         {/* Tabs group */}
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>
+      <Toast />
+
+      </RootSiblingParent>
+
     </ThemeProvider>
   );
 }

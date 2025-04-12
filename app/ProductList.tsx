@@ -3,7 +3,7 @@ import React from 'react';
 import { Ionicons, Feather, Entypo, FontAwesome, AntDesign } from '@expo/vector-icons';
 import { useProductStore } from '@/store/useProductStore';
 import Toast from 'react-native-root-toast';
-import { useLocalSearchParams, useNavigation } from 'expo-router';
+import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useFavoriteStore } from '../store/useFavoriteStore'; // adjust path if needed
 
 
@@ -262,7 +262,7 @@ const ProductList = () => {
             <FontAwesome name="filter" size={24} color="#000" />
             
             <TouchableOpacity
-              onPress={() => navigation.navigate('Cart')}
+              onPress={() => router.push('/Cart')}
               style={styles.cartIconContainer}
             >
               <Ionicons name="cart-outline" size={28} color="black" />
@@ -278,7 +278,7 @@ const ProductList = () => {
 
       {/* Search Input */}
       <View className="mb-4 bg-white p-4">
-        <View className='flex-row bg-gray-100 items-center p-3 rounded-lg gap-2'>
+        <View className='flex-row bg-gray-100 items-center p-0 h-12 px-3 rounded-lg gap-2'>
           <AntDesign name="search1" size={20} color="#999" />
           <TextInput
               placeholder="Search vegetables..."
@@ -302,7 +302,7 @@ const ProductList = () => {
           key={index}
           onPress={() => {
             useProductStore.getState().setSelectedProduct(item);
-            navigation.navigate('ProductDetails');
+            router.push('/ProductDetails');
           }}
           className="bg-white p-4 rounded-lg mb-4"
           style={{ width: '48%' }}

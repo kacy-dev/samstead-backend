@@ -52,14 +52,14 @@ const favoriteItems = [
   },
 ];
 
-const Favorites = () => {
+const favorites = () => {
   const navigation = useNavigation();
   
   const renderItem = ({ item }: any) => (
     <View className="flex-row bg-white rounded-xl p-4 mb-4 mx-4 items-center">
       <TouchableOpacity className="flex-row items-center flex-1"  onPress={() => {
                   useProductStore.getState().setSelectedProduct(item);
-                  navigation.navigate('ProductDetails');
+                  router.push('/ProductDetails');
                 }}>
       <Image
         source={item.image}
@@ -90,4 +90,4 @@ const Favorites = () => {
   );
 };
 
-export default Favorites;
+export default favorites;

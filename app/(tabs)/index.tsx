@@ -1,20 +1,15 @@
-import { View, Text, Image, TextInput, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { useProductStore } from '@/store/useProductStore';
-import { router, useNavigation } from 'expo-router';
+import { router } from 'expo-router';
 import Header from '@/components/Header';
 import Toast from 'react-native-root-toast';
 
-
-
 export default function TabOneScreen () {
   const [search, setSearch] = useState('');
-  const navigation = useNavigation();
 
-  
-  
   // mock/products.ts
 const dailyDeals = [
   {
@@ -113,7 +108,7 @@ const RecommendedProducts = [
         <View className="p-4 rounded-2xl mb-4 mt-[-20px]" style={{ backgroundColor: '#058044' }}>
           <Text className="text-white font-bold text-2xl mb-1">Premium Membership</Text>
           <Text className="text-white text-lg mb-4">Get exclusive deals and priority delivery</Text>
-          <TouchableOpacity className="mt-2 bg-white py-4 px-4 rounded-lg w-36" onPress={() => router.push('/')}>
+          <TouchableOpacity className="mt-2 bg-white py-4 px-4 rounded-lg w-36" onPress={() => router.push('/Pricing')}>
             <Text className="font-semibold text-center" style={{color: '#058044'}}>Upgrade Now</Text>
           </TouchableOpacity>
         </View>
@@ -130,7 +125,7 @@ const RecommendedProducts = [
             <TouchableOpacity
               onPress={() => {
                 useProductStore.getState().setSelectedProduct(item);
-                navigation.navigate('ProductDetails');
+                router.push('/ProductDetails');
               }} key={index} className="bg-white p-4 rounded-lg mx-2 min-w-[170px]"
             >
               <Image source={item.image} className="w-full h-20 rounded-lg mb-3 mt-2" resizeMode="contain" />
@@ -193,7 +188,7 @@ const RecommendedProducts = [
             <TouchableOpacity
             onPress={() => {
               useProductStore.getState().setSelectedProduct(item);
-              navigation.navigate('ProductDetails');
+              router.push('/ProductDetails');
             }} key={index} className="bg-white p-4 rounded-lg mx-2 min-w-[170px]"
           >
               <Image source={item.image} className="w-full h-20 rounded-lg mb-3 mt-2" resizeMode="contain" />
@@ -223,7 +218,7 @@ const RecommendedProducts = [
           ))}
         </ScrollView>
 
-        <StatusBar style='dark'/>
+        <StatusBar style='dark' backgroundColor='white'/>
      </ScrollView>
     </View>
   );

@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
-import { useNavigation } from 'expo-router';
+import { router, useNavigation } from 'expo-router';
 import { useProductStore } from '@/store/useProductStore';
+import { push } from 'expo-router/build/global-state/routing';
 
 const Header = () => {
   const cart = useProductStore((state) => state.cart);
@@ -16,9 +17,11 @@ const Header = () => {
         resizeMode="contain"
       />
       <View className="flex-row items-center justify-end  gap-4">
+        <TouchableOpacity onPress={() => router.push('/Search')}>
         <AntDesign name="search1" size={30} color="gray" />
+        </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => navigation.navigate('Cart')}
+          onPress={() => router.push('/Cart')}
           style={styles.cartIconContainer}
         >
           <Ionicons name="cart-outline" size={28} color="black" />

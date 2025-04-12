@@ -4,7 +4,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import colors from '@/components/colors';
 import SuccessModal from '@/components/SuccessModal';
 
-const OtpVerification = () => {
+const ResetOtpVerification = () => {
   const { user_id, otp: expectedOtp } = useLocalSearchParams();
   const inputs = useRef<Array<TextInput | null>>([]);
   const [otp, setOtp] = useState(['', '', '', '']);
@@ -136,9 +136,9 @@ const OtpVerification = () => {
       </View>
 
       {/* Title */}
-      <Text className="text-2xl font-bold text-center mb-2">Verify Your Account</Text>
+      <Text className="text-2xl font-bold text-center mb-2">Verify Your Email</Text>
       <Text className="text-gray-500 text-lg font-semibold text-center mb-6">
-        Please enter the verification code sent to your{'\n'}email/phone
+        Please enter the verification code sent to your{'\n'}email address
       </Text>
 
       {/* OTP Boxes */}
@@ -171,7 +171,7 @@ const OtpVerification = () => {
       <TouchableOpacity
         className="py-4 px-8 rounded-md w-full mb-4"
         style={{ backgroundColor: colors.primary }}
-        onPress={() => router.push('/Pricing')}
+        onPress={() => router.push('/ResetPassword')}
         disabled={loading}
       >
         <Text className="text-white text-center text-lg text-base font-semibold">
@@ -196,4 +196,4 @@ const OtpVerification = () => {
   );
 };
 
-export default OtpVerification;
+export default ResetOtpVerification;

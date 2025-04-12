@@ -73,7 +73,7 @@ const Onboarding = () => {
             source={require('../assets/icons/logo.png')}
             style={{ width: 85, height: 30, resizeMode: 'contain' }}
           />
-          <TouchableOpacity onPress={() => router.push('/LoginScreen')}>
+          <TouchableOpacity onPress={() => router.push('/(tabs)')}>
             <Text className="text-white text-lg font-medium">Skip</Text>
           </TouchableOpacity>
         </View>

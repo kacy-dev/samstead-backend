@@ -14,7 +14,7 @@ const categoriesData = [
   { name: 'Beverages', desc: 'Drinks & juices', icon: require('../../assets/products/6.png'), bg: '#F6F0FF' },
 ];
 
-const CategoriesScreen = () => {
+const categories = () => {
   return (
     <ScrollView className='flex-1 px-4 py-2' style={styles.container}>
       <StatusBar style="dark" backgroundColor="#f8f8f8" />
@@ -73,7 +73,7 @@ const CategoriesScreen = () => {
   );
 };
 
-export default CategoriesScreen;
+export default categories;
 
 const styles = StyleSheet.create({
   container: {

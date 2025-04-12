@@ -2,7 +2,7 @@ import { View, Text, Image, TouchableOpacity, ScrollView } from 'react-native';
 import React from 'react';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
 import { useProductStore } from '@/store/useProductStore';
-import { useNavigation } from 'expo-router';
+import { router, useNavigation } from 'expo-router';
 
 const Cart = () => {
   const cart = useProductStore((state) => state.cart);
@@ -105,7 +105,15 @@ const Cart = () => {
             </View>
           </View>
 
-          <TouchableOpacity className="bg-green-600 py-4 rounded-lg mb-10" style={{ width: '92%', alignSelf: 'center' }}>
+          <TouchableOpacity className="bg-green-600 py-4 rounded-lg mb-10" style={{ width: '92%', alignSelf: 'center' }} 
+          onPress={() => router.push({
+            pathname: '/Checkout',
+            params: {
+              cartItems: JSON.stringify(cart), // 👈 stringify the array before passing
+            },
+          })}
+          
+          >
             <Text className="text-white font-semibold text-center" style={{fontSize: 16}}>Proceed to Checkout</Text>
           </TouchableOpacity>
         </>
