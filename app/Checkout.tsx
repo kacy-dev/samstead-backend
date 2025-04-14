@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity, Image } from 'react-native'
 import React, { useState } from 'react'
-import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
+import { GestureHandlerRootView, ScrollView, TextInput } from 'react-native-gesture-handler'
 import { AntDesign, Ionicons, MaterialIcons } from '@expo/vector-icons'
 import { router, useLocalSearchParams } from 'expo-router'
 import colors from '@/components/colors'
@@ -114,6 +114,58 @@ const Checkout = () => {
             />
           </TouchableOpacity>
         </View>
+
+        {/* Credit Card Inputs (only when card is selected) */}
+        {paymentMethod === 'card' && (
+          <View className="mb-4">
+            <Text className="text-xl font-bold mb-6">Card Details</Text>
+
+            <View className="mb-3">
+              <Text className="text-xsm font-semibold mb-1">Card Number</Text>
+              <TextInput 
+              className='border py-4 px-4 border-gray-400 rounded-lg' 
+              placeholder='**** **** **** 1234' 
+              placeholderTextColor="gray"
+              keyboardType='numeric'
+              maxLength={17}
+            />
+            </View>
+
+            <View className="flex-row justify-between gap-4 mb-3">
+              <View className="flex-1">
+                <Text className="text-xsm font-semibold mb-1">Expiry Date</Text>
+                <TextInput 
+                className='border py-4 px-4 border-gray-400 rounded-lg' 
+                placeholder='12/24'
+                placeholderTextColor="gray"
+                keyboardType='numeric'
+              />
+              </View>
+              <View className="flex-1">
+                <Text className="text-xsm font-semibold mb-1">CVV</Text>
+                <TextInput 
+                className='border py-4 px-4 border-gray-400 rounded-lg' 
+                placeholder='***' 
+                placeholderTextColor="gray"
+                keyboardType='numeric'
+                maxLength={3}
+              />
+              </View>
+            </View>
+
+            <View className="mb-3">
+              <Text className="text-xsm font-semibold mb-1">Card Pin</Text>
+              <TextInput 
+              className='border py-4 px-4 border-gray-400 rounded-lg' 
+              placeholder='****' 
+              placeholderTextColor="gray"
+              keyboardType='numeric'
+              maxLength={4}
+            />
+            </View>
+          </View>
+        )}
+
 
         {/* Price Summary */}
         <View className="py-4">

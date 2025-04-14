@@ -1,12 +1,13 @@
-import { Text, View, TextInput, ScrollView, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import React, { useState } from 'react';
+import { Text, View, TextInput, ScrollView, Image, TouchableOpacity, StyleSheet, Platform, KeyboardAvoidingView } from 'react-native';
 import { Ionicons, Feather, Entypo, FontAwesome, AntDesign } from '@expo/vector-icons';
-import { useProductStore } from '@/store/useProductStore';
 import Toast from 'react-native-root-toast';
-import { router, useLocalSearchParams, useNavigation } from 'expo-router';
-import { useFavoriteStore } from '../store/useFavoriteStore'; // adjust path if needed
+import { router, useNavigation } from 'expo-router';
+import { useProductStore } from '@/store/useProductStore';
+import Modal from 'react-native-modal'; 
 
-
+// Categories for the dropdown
+const categories = ['All', 'Dairy & Eggs', 'Meat & Poultry', 'Seafood', 'Bakery'];
 const products = [
   {
     name: 'Fresh Tomatoes',
@@ -236,15 +237,22 @@ const products = [
 
 const AllProducts = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [isFilterModalVisible, setFilterModalVisible] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+
   const navigation = useNavigation();
   const cart = useProductStore((state) => state.cart);
-  const favorites = useFavoriteStore((state) => state.favorites);
-  const toggleFavorite = useFavoriteStore((state) => state.toggleFavorite);
-  const isFavorited = useFavoriteStore((state) => state.isFavorited);
 
-  // Filter products by category (if category is passed) and search query
+
+  // Filter logic
   const filteredProducts = products.filter((item) => {
-    return item.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchCategory = selectedCategory === 'All' || item.category === selectedCategory;
+    const matchPrice =
+      (!priceRange.min || parseFloat(item.price) >= parseFloat(priceRange.min)) &&
+      (!priceRange.max || parseFloat(item.price) <= parseFloat(priceRange.max));
+    return matchSearch && matchCategory && matchPrice;
   });
 
   return (
@@ -255,17 +263,14 @@ const AllProducts = () => {
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" size={24} color="#000" />
           </TouchableOpacity>
-          <Text className="text-lg font-semibold text-black">
-            {'Products'}
-          </Text>
+          <Text className="text-lg font-semibold text-black">Products</Text>
         </View>
 
         <View className="flex-row items-center gap-4">
-          <FontAwesome name="filter" size={24} color="#000" />
-          <TouchableOpacity
-            onPress={() => router.push('/Cart')}
-            style={styles.cartIconContainer}
-          >
+          <TouchableOpacity onPress={() => setFilterModalVisible(true)}>
+            <FontAwesome name="filter" size={24} color="#000" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push('/Cart')} style={styles.cartIconContainer}>
             <Ionicons name="cart-outline" size={28} color="black" />
             {cart.length > 0 && (
               <View style={styles.badge}>
@@ -284,78 +289,151 @@ const AllProducts = () => {
             placeholder="Search products..."
             placeholderTextColor="#999"
             value={searchQuery}
-            onChangeText={setSearchQuery} // Update search query state
+            onChangeText={setSearchQuery}
             className="flex-1"
           />
         </View>
       </View>
 
-      {/* Product Grid */}
-      <ScrollView showsVerticalScrollIndicator={false} className="mb-4 p-4">
-        {filteredProducts.length === 0 ? (
-          <View className="items-center justify-center h-96" style={{ top: 80 }}>
-            <Ionicons name="cart-outline" size={64} color="#ccc" />
-            <Text className="mt-4 text-lg font-semibold text-gray-500">
-              No product found matching your search
-            </Text>
-          </View>
-        ) : (
-          <View className="flex-row flex-wrap justify-between">
-            {filteredProducts.map((item, index) => (
-              <TouchableOpacity
-                key={index}
-                onPress={() => {
-                  useProductStore.getState().setSelectedProduct(item);
-                  router.push('/ProductDetails');
-                }}
-                className="bg-white p-4 rounded-lg mb-4"
-                style={{ width: '48%' }}
-              >
-                <Image
-                  source={item.image}
-                  className="w-full h-20 rounded-lg mb-3 mt-2"
-                  resizeMode="contain"
-                />
-                <View className="flex-row items-center justify-between mt-2">
-                  <Text className="font-bold text-lg flex-1">{item.name}</Text>
-                  <TouchableOpacity>
-                    <Ionicons name="heart-outline" size={22} />
-                  </TouchableOpacity>
-                </View>
-                <Text className="text-gray-500 text-lg font-semibold">
-                  {item.weight}g Pack
-                </Text>
-
-                <View className="flex-row justify-between items-center mt-4">
-                  <View>
-                    <Text className="text-lg font-bold text-green-600">
-                      ₦{parseFloat(item.price).toFixed(2)}
-                    </Text>
-                    {item.oldPrice && (
-                      <Text className="text-gray-500 line-through">
-                        ₦{parseFloat(item.oldPrice).toFixed(2)}
-                      </Text>
-                    )}
-                  </View>
-                  <TouchableOpacity
-                    className="p-2 rounded-lg w-10 h-12 justify-center items-center"
-                    style={{ backgroundColor: '#058044' }}
-                    onPress={() => {
-                      useProductStore.getState().addToCart(item);
-                      Toast.show(`${item.name} added to cart`, {
-                        duration: Toast.durations.SHORT,
-                        position: Toast.positions.BOTTOM,
-                      });
-                    }}
-                  >
-                    <FontAwesome name="plus" size={16} color="white" />
-                  </TouchableOpacity>
-                </View>
+      {/* Product List */}
+      <ScrollView className="p-4">
+        <View className="flex-row flex-wrap justify-between">
+          {filteredProducts.map((item, index) => (
+            <TouchableOpacity
+            key={index}
+            onPress={() => {
+              useProductStore.getState().setSelectedProduct(item);
+              router.push('/ProductDetails');
+            }}
+            className="bg-white p-4 rounded-lg mb-4"
+            style={{ width: '48%' }}
+          >
+            <Image
+              source={item.image}
+              className="w-full h-20 rounded-lg mb-3 mt-2"
+              resizeMode="contain"
+            />
+            <View className="flex-row items-center justify-between mt-2">
+              <Text className="font-bold text-lg flex-1">{item.name}</Text>
+              <TouchableOpacity>
+                <Ionicons name="heart-outline" size={22} />
               </TouchableOpacity>
-            ))}
-          </View>
-        )}
+            </View>
+            <Text className="text-gray-500 text-lg font-semibold">
+              {item.weight}g Pack
+            </Text>
+
+            <View className="flex-row justify-between items-center mt-4">
+              <View>
+                <Text className="text-lg font-bold text-green-600">
+                  ₦{parseFloat(item.price).toFixed(2)}
+                </Text>
+                {item.oldPrice && (
+                  <Text className="text-gray-500 line-through">
+                    ₦{parseFloat(item.oldPrice).toFixed(2)}
+                  </Text>
+                )}
+              </View>
+              <TouchableOpacity
+                className="p-2 rounded-lg w-10 h-12 justify-center items-center"
+                style={{ backgroundColor: '#058044' }}
+                onPress={() => {
+                  useProductStore.getState().addToCart(item);
+                  Toast.show(`${item.name} added to cart`, {
+                    duration: Toast.durations.SHORT,
+                    position: Toast.positions.BOTTOM,
+                  });
+                }}
+              >
+                <FontAwesome name="plus" size={16} color="white" />
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+          ))}
+        </View>
       </ScrollView>
+
+      {/* Filter Modal */}
+      
+
+<Modal
+  isVisible={isFilterModalVisible}
+  onBackdropPress={() => setFilterModalVisible(false)}
+  style={{ justifyContent: 'flex-end', margin: 0 }}
+  avoidKeyboard={true} // important to let Modal adjust for keyboard
+>
+  <KeyboardAvoidingView
+    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    keyboardVerticalOffset={Platform.OS === 'ios' ? 5 : 0} // adjust if needed
+  >
+    <View
+      style={{
+        backgroundColor: 'white',
+        padding: 20,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+      }}
+    >
+      <Text className="text-2xl font-bold mb-4">Filter Products</Text>
+
+      {/* Category Filter */}
+      <Text className="mb-2 text-lg font-semibold">Category</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        {categories.map((cat) => (
+          <TouchableOpacity
+            key={cat}
+            onPress={() => setSelectedCategory(cat)}
+            style={[
+              styles.chip,
+              selectedCategory === cat && { backgroundColor: '#058044' },
+            ]}
+          >
+            <Text
+              style={{
+                color: selectedCategory === cat ? '#fff' : '#000',
+              }}
+            >
+              {cat}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+      {/* Price Filter */}
+      <Text className="mt-4 text-lg mb-2 font-semibold">Price Range</Text>
+      <View className="flex-row gap-4">
+        <TextInput
+          keyboardType="numeric"
+          placeholder="Min"
+          value={priceRange.min}
+          onChangeText={(val) =>
+            setPriceRange((prev) => ({ ...prev, min: val }))
+          }
+          style={styles.priceInput}
+          placeholderTextColor="gray"
+        />
+        <TextInput
+          keyboardType="numeric"
+          placeholder="Max"
+          value={priceRange.max}
+          onChangeText={(val) =>
+            setPriceRange((prev) => ({ ...prev, max: val }))
+          }
+          style={styles.priceInput}
+          placeholderTextColor="gray"
+        />
+      </View>
+
+      {/* Apply Button */}
+      <TouchableOpacity
+        onPress={() => setFilterModalVisible(false)}
+        className="bg-green-700 py-4 rounded-xl mt-6 items-center"
+      >
+        <Text className="text-white text-lg font-semibold">Apply Filters</Text>
+      </TouchableOpacity>
+    </View>
+  </KeyboardAvoidingView>
+</Modal>
     </View>
   );
 };
@@ -381,5 +459,20 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 12,
     fontWeight: 'bold',
+  },
+  chip: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: '#eee',
+    borderRadius: 20,
+    marginRight: 8,
+  },
+  priceInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    height: 45,
   },
 });

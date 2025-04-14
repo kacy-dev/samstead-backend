@@ -73,7 +73,6 @@ function RootLayoutNav({ isSplashDone }: { isSplashDone: boolean }) {
         <Stack.Screen name="TrackOrder" options={{ headerShown: false }} />
         <Stack.Screen name="Pricing" options={{ headerShown: false }} />
         <Stack.Screen name="CheckoutScreen" options={{ headerShown: false }} />
-        <Stack.Screen name="Settings" options={{ headerShown: false }} />
         <Stack.Screen name="Orders" options={{ headerShown: false }} />
         <Stack.Screen name="EditProfile" options={{ headerShown: false }} />
         <Stack.Screen name="Search" options={{ headerShown: false }} />
@@ -82,6 +81,10 @@ function RootLayoutNav({ isSplashDone }: { isSplashDone: boolean }) {
         <Stack.Screen name="ResetPassword" options={{ headerShown: false }} />
         <Stack.Screen name="ResetOtpVerification" options={{ headerShown: false }} />
         <Stack.Screen name="Notifications" options={{ headerShown: false }} />
+        <Stack.Screen name="Support" options={{ headerShown: false }} />
+        <Stack.Screen name="Faq" options={{ headerShown: false }} />
+        <Stack.Screen name="TermsCondition" options={{ headerShown: false }} />
+        <Stack.Screen name="DeliveryAgent" options={{ headerShown: false }} />
         {/* Tabs group */}
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>

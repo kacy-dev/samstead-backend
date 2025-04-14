@@ -259,8 +259,6 @@ const ProductList = () => {
           </View>
           
           <View className="flex-row items-center gap-4">
-            <FontAwesome name="filter" size={24} color="#000" />
-            
             <TouchableOpacity
               onPress={() => router.push('/Cart')}
               style={styles.cartIconContainer}
@@ -274,7 +272,6 @@ const ProductList = () => {
             </TouchableOpacity>
           </View>
         </View>
-
 
       {/* Search Input */}
       <View className="mb-4 bg-white p-4">

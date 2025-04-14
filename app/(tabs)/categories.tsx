@@ -26,7 +26,7 @@ const categories = () => {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Categories</Text>
         </View>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push('/Search')}>
           <Ionicons name="search" size={22} />
         </TouchableOpacity>
       </View>

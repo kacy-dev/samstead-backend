@@ -50,7 +50,7 @@ const account = () => {
               <Text className='font-regular text-gray-500 text-sm'>Valid until Dec 31, 2025</Text>
             </View>
           </View>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push('/Pricing')}>
             <Text className='text-green-600 font-bold'>Renew</Text>
           </TouchableOpacity>
         </View>
@@ -93,21 +93,21 @@ const account = () => {
       {/* Support */}
       <View className='bg-white mt-4 rounded-lg p-4 mb-4'>
         <Text className='text-lg font-bold mb-4'>Support</Text>
-        <TouchableOpacity className='flex-row justify-between items-center mb-8'>
+        <TouchableOpacity className='flex-row justify-between items-center mb-8' onPress={() => router.replace('/Support')}>
           <View className='flex-row items-center gap-4'>
             <MaterialIcons name="support-agent" size={20} color="#4B5563" />
             <Text className='font-bold'>Contact Support</Text>
           </View>
           <Ionicons name="chevron-forward-outline" size={18} color="#4B5563" />
         </TouchableOpacity>
-        <TouchableOpacity className='flex-row justify-between items-center mb-8'>
+        <TouchableOpacity className='flex-row justify-between items-center mb-8' onPress={() => router.replace('/Faq')}>
           <View className='flex-row items-center gap-4'>
             <AntDesign name="questioncircle" size={20} color="#4B5563" />
             <Text className='font-bold'>FAQs</Text>
           </View>
           <Ionicons name="chevron-forward-outline" size={18} color="#4B5563" />
         </TouchableOpacity>
-        <TouchableOpacity className='flex-row justify-between items-center mb-8'>
+        <TouchableOpacity className='flex-row justify-between items-center mb-8' onPress={() => router.replace('/TermsCondition')}>
           <View className='flex-row items-center gap-4'>
             <MaterialIcons name="my-library-books" size={20} color="#4B5563" />
             <Text className='font-bold'>Terms & Conditions</Text>
