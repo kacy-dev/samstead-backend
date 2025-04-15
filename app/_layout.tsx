@@ -6,7 +6,6 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
 import "../global.css";
-import { useColorScheme } from '@/components/useColorScheme';
 import { useAuthStore } from '@/store/useAuthStore';
 import { RootSiblingParent } from 'react-native-root-siblings';
 import Toast from 'react-native-toast-message';
@@ -50,10 +49,8 @@ export default function RootLayout() {
 
 
 function RootLayoutNav({ isSplashDone }: { isSplashDone: boolean }) {
-  const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <RootSiblingParent>
       <Stack initialRouteName={isSplashDone ? "(tabs)" : "Splash"}>
         {/* Splash Screen as initial route */}
@@ -85,13 +82,11 @@ function RootLayoutNav({ isSplashDone }: { isSplashDone: boolean }) {
         <Stack.Screen name="Faq" options={{ headerShown: false }} />
         <Stack.Screen name="TermsCondition" options={{ headerShown: false }} />
         <Stack.Screen name="DeliveryAgent" options={{ headerShown: false }} />
+        <Stack.Screen name="AddressBook" options={{ headerShown: false }} />
         {/* Tabs group */}
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>
       <Toast />
-
       </RootSiblingParent>
-
-    </ThemeProvider>
   );
 }

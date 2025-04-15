@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 import { Ionicons, MaterialIcons, Feather, MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
 import { useProductStore } from '@/store/useProductStore';
-import Header from '@/components/Header';
 import Toast from 'react-native-root-toast';
+import BackHeader from '@/components/BackHeader';
 
 const ProductDetails = () => {
   const [quantity, setQuantity] = useState(1);
@@ -21,8 +21,8 @@ const ProductDetails = () => {
 
   return (
     <View className="flex-1 bg-white p-4">
-        <Header/>
-      <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
+      <BackHeader/>
+      <ScrollView showsVerticalScrollIndicator={false} className="flex-1 mt-6">
         {/* Product Image and Top Icons */}
       <View className="relative mb-10">
         <Image
@@ -116,7 +116,7 @@ const ProductDetails = () => {
       <View className="flex-row items-center justify-between mt-4 mb-4 btw-1">
         <View className="flex-row items-center space-x-2 bg-gray-100 p-4 px-6 py-6 gap-2 rounded-lg">
           <TouchableOpacity
-            onPress={() => setQuantity(prev => (prev > 1 ? prev - 1 : 1))}
+            onPress={() => setQuantity(prev => (prev > 0 ? prev - 1 : 0))}
             className="px-3 rounded-md"
           >
             <AntDesign name='minus' size={18}/>
@@ -129,20 +129,33 @@ const ProductDetails = () => {
             <AntDesign name='plus' size={18}/>
           </TouchableOpacity>
         </View>
-        <TouchableOpacity className="bg-green-600 px-4 py-6 rounded-lg p-4"
+        <TouchableOpacity
+          className={`px-4 py-6 rounded-lg p-4 ${
+            quantity > 0 ? 'bg-green-600' : 'bg-gray-400'
+          }`}
+          disabled={quantity === 0}
           onPress={() => {
+            const unitPrice = Number(product.price); // Ensure it's a number
+            const totalPrice = (unitPrice * quantity).toString(); // Convert to string
+          
             useProductStore.getState().addToCart({
               ...product,
+              quantity,
+              totalPrice, // Now it's a string ✅
             });
-
+          
             Toast.show(`${product.name} added to cart`, {
               duration: Toast.durations.SHORT,
               position: Toast.positions.BOTTOM,
             });
           }}
         >
-          <Text className="text-white font-semibold">Add to Cart - ₦{formatPrice(product.price)}</Text>
-        </TouchableOpacity>
+        <Text className="text-white font-semibold">
+          Add to Cart - ₦{formatPrice(Number(product.price) * quantity)}
+        </Text>
+
+      </TouchableOpacity>
+
       </View>
       </ScrollView>
     </View>

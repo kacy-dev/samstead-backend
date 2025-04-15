@@ -4,8 +4,10 @@ import { AntDesign, Ionicons } from '@expo/vector-icons';
 import { useProductStore } from '@/store/useProductStore';
 import { router, useNavigation } from 'expo-router';
 
-const Cart = () => {
+const Cart = () => {  // Ensure Cart is defined as a functional component
   const cart = useProductStore((state) => state.cart);
+  const increaseQuantity = useProductStore((state) => state.increaseQuantity);
+  const decreaseQuantity = useProductStore((state) => state.decreaseQuantity);
   const removeFromCart = useProductStore((state) => state.removeFromCart);
   const navigation = useNavigation();
 
@@ -16,18 +18,20 @@ const Cart = () => {
       minimumFractionDigits: 2,
     }).format(amount).replace("NGN", "₦");
   };
-  
 
   const deliveryFee = 500;
 
   // 🧮 Calculate subtotal
   const subtotal = cart.reduce((total, item) => {
     const price = parseFloat(item.price);
-    return total + (isNaN(price) ? 0 : price);
+    return total + (isNaN(price) ? 0 : price * (item.quantity || 1));
   }, 0);
 
   // 💰 Total price = subtotal + deliveryFee
   const total = subtotal + deliveryFee;
+
+  // 🧮 Calculate total quantity
+  const totalQuantity = cart.reduce((total, item) => total + (item.quantity || 0), 0);
 
   return (
     <ScrollView className="flex-1" style={{ backgroundColor: '#f6f6f6' }}>
@@ -37,7 +41,7 @@ const Cart = () => {
       </View>
 
       {cart.length === 0 ? (
-        <View className="items-center justify-center h-96" style={{top: 200}}>
+        <View className="items-center justify-center h-96" style={{ top: 200 }}>
           <Ionicons name="cart-outline" size={64} color="#ccc" />
           <Text className="mt-4 text-lg font-semibold text-gray-500">No product added</Text>
         </View>
@@ -60,23 +64,28 @@ const Cart = () => {
 
               <View className="flex-1 justify-between">
                 <View className="flex-row justify-between items-start">
-                  <Text className="font-semibold  pr-4" style={{fontSize: 16}}>{item.name}</Text>
-                  <TouchableOpacity
-                    className="rounded "
-                    onPress={() => removeFromCart(i)}
-                  >
+                  <Text className="font-semibold pr-4" style={{ fontSize: 16 }}>{item.name}</Text>
+                  <TouchableOpacity className="rounded" onPress={() => removeFromCart(i)}>
                     <Ionicons name="trash" size={22} color="#777" />
                   </TouchableOpacity>
                 </View>
                 <Text className="text-gray-500 font-semibold text-lg">{item.weight}g Pack</Text>
                 <View className="flex-row items-center justify-between mt-2">
-                  <Text className="text-green-600 font-bold" style={{flex: 1, fontSize: 16}}>{formatPrice(parseFloat(item.price))}</Text>
+                  <Text className="text-green-600 font-bold" style={{ flex: 1, fontSize: 16 }}>
+                    {formatPrice(parseFloat(item.price) * (item.quantity || 1))}
+                  </Text>
                   <View className="flex-row items-center justify-between bg-gray-100 rounded-lg" style={{ width: 80, padding: 8 }}>
-                    <TouchableOpacity className="rounded">
+                    <TouchableOpacity
+                      className="rounded"
+                      onPress={() => decreaseQuantity(i)} // Decrease quantity when pressed
+                    >
                       <AntDesign name="minus" size={18} />
                     </TouchableOpacity>
-                    <Text className="mx-2">1</Text>
-                    <TouchableOpacity className="rounded ">
+                    <Text className="mx-2">{item.quantity && item.quantity > 0 ? item.quantity : 1}</Text>
+                    <TouchableOpacity
+                      className="rounded"
+                      onPress={() => increaseQuantity(i)} // Increase quantity when pressed
+                    >
                       <AntDesign name="plus" size={18} />
                     </TouchableOpacity>
                   </View>
@@ -86,10 +95,10 @@ const Cart = () => {
           ))}
 
           {/* Order Summary */}
-          <View className="bg-gray-100 p-4 my-4 mt-6 bg-white mb-4" style={{ borderTopWidth: 1, borderTopColor: '#ccc',}}>
+          <View className="bg-gray-100 p-4 my-4 mt-6 bg-white mb-4" style={{ borderTopWidth: 1, borderTopColor: '#ccc' }}>
             <Text className="font-semibold text-lg mb-3">Order Summary</Text>
             <View className="flex-row justify-between mb-2 items-center">
-              <Text className="text-gray-600  font-semibold">Subtotal</Text>
+              <Text className="text-gray-600 font-semibold">Subtotal</Text>
               <Text className="text-black font-semibold text-lg">{formatPrice(subtotal)}</Text>
             </View>
             <View
@@ -105,16 +114,23 @@ const Cart = () => {
             </View>
           </View>
 
-          <TouchableOpacity className="bg-green-600 py-4 rounded-lg mb-10" style={{ width: '92%', alignSelf: 'center' }} 
-          onPress={() => router.push({
-            pathname: '/Checkout',
-            params: {
-              cartItems: JSON.stringify(cart), // 👈 stringify the array before passing
-            },
-          })}
-          
+          <TouchableOpacity
+            className="bg-green-600 py-4 rounded-lg mb-10"
+            style={{ width: '92%', alignSelf: 'center' }}
+            onPress={() =>
+              router.push({
+                pathname: '/Checkout',
+                params: {
+                  cartItems: JSON.stringify(cart), // 👈 stringify the array before passing
+                  totalQuantity: totalQuantity,   // Send total quantity
+                  totalPrice: total,              // Send total price
+                },
+              })
+            }
           >
-            <Text className="text-white font-semibold text-center" style={{fontSize: 16}}>Proceed to Checkout</Text>
+            <Text className="text-white font-semibold text-center" style={{ fontSize: 16 }}>
+              Proceed to Checkout
+            </Text>
           </TouchableOpacity>
         </>
       )}

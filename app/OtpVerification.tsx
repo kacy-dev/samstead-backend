@@ -78,7 +78,7 @@ const OtpVerification = () => {
         // AsyncStorage.setItem('userToken', token);
 
         // Navigate to the LoginScreen
-        router.push('/Pricing');
+        router.push('/LoginScreen');
       } else {
         alert(data.message || 'Verification failed. Please try again.');
       }

@@ -183,7 +183,7 @@ const SignupScreen = () => {
       <TouchableOpacity
         className="py-4 rounded-lg mb-6 flex-row justify-center"
         style={{ backgroundColor: colors.primary }}
-        onPress={() => router.push('/OtpVerification')}
+        onPress={handleRegister}
         disabled={loading}
       >
         {loading ? (
