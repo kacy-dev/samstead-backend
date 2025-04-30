@@ -29,7 +29,7 @@ const productSchema: Schema = new Schema<IProduct>(
     },
     image: {
       type: String,
-      required: true,
+      // required: true,
     },
   },
   { timestamps: true }

@@ -64,10 +64,18 @@ export const initialize = async (
 
 /**
  * @swagger
- * /verify/:reference:
+ * /verify/{reference}:
  *   get:
  *     summary: Verify a paystack transaction
  *     description: This endpoint verifies payments made using paystack.
+ *     parameters:
+ *       - in: path
+ *         name: reference
+ *         required: true
+ *         description: The reference of the initialized transaction
+ *         schema:
+ *           type: string
+ *         example: 268hde768n
  *     requestBody:
  *       required: true
  *       content:

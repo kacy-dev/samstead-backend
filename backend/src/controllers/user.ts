@@ -4,10 +4,18 @@ import { User } from "../models/user.model";
 
 /**
  * @swagger
- * /edit-profile:
+ * /edit-profile/{id}:
  *   put:
  *     summary: Edit a user's profile
  *     description: This endpoint is used for editing a user's profile.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: The ID of the user to edit
+ *         schema:
+ *           type: string
+ *         example: 680f59c92675fa9d8855982d
  *     requestBody:
  *       required: true
  *       content:
@@ -15,21 +23,18 @@ import { User } from "../models/user.model";
  *           schema:
  *             type: object
  *             properties:
- *               userId:
- *                 type: ObjectId
- *                 example: 4797hf087e0fjh48
  *               name:
  *                 type: string
  *                 example: John Doe
- *               email
+ *               email:
  *                 type: string
- *                 example: johndoe@gmail.com
- *               phoneNumber
- *                  type: number
- *                  example: 0123456789
- *               deliveryAddress
- *                  type: string
- *                  example: third mainland bridge
+ *                 example: "johndoe@mail.com"
+ *               phoneNumber:
+ *                 type: string
+ *                 example: "0123456789"
+ *               deliveryAddress:
+ *                 type: string
+ *                 example: "Third Mainland Bridge"
  *     responses:
  *       200:
  *         description: User Profile Edited Successfully
@@ -43,6 +48,22 @@ import { User } from "../models/user.model";
  *                   example: "User Profile Edited Successfully"
  *                 user:
  *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: 680f59c92675fa9d8855982d
+ *                     name:
+ *                       type: string
+ *                       example: "John Doe"
+ *                     email:
+ *                       type: string
+ *                       example: "johndoe@mail.com"
+ *                     phoneNumber:
+ *                       type: string
+ *                       example: "0123456789"
+ *                     deliveryAddress:
+ *                       type: string
+ *                       example: "Third Mainland Bridge"
  *       400:
  *         description: Bad request - Error editing profile
  *       500:
@@ -53,7 +74,7 @@ export const editProfile = async (
   res: Response
 ): Promise<void> => {
   const { name, email, phoneNumber, deliveryAddress } = req.body;
-  const { id } = req.body;
+  const { id } = req.params;
 
   if (!id) {
     throw new Error("401 Unauthorized");

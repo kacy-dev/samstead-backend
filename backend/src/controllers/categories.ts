@@ -131,9 +131,6 @@ export const editCategory = async (
  *           schema:
  *             type: object
  *             properties:
- *               name:
- *                 type: string
- *                 example: food
  *               categoryId:
  *                 type: ObjectId
  *                 example: 680f59c92675fa9d8855982d
@@ -159,10 +156,10 @@ export const deleteCategory = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { name, categoryId } = req.body;
+  const { categoryId } = req.body;
 
-  if (!name || !categoryId) {
-    throw new Error("Category id and name not found");
+  if (!categoryId) {
+    throw new Error("Category id not found");
   }
 
   try {

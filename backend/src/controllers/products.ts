@@ -52,13 +52,23 @@ export const createProduct = async (
 ): Promise<void> => {
   const { name, price, description, categoryId } = req.body;
 
-  if (!name || price || description || categoryId) {
+  if (!name || !price || !description || !categoryId) {
     throw new Error("Category name, price, description and id are required");
   }
 
   try {
     const newProduct = new Product({ name, price, description, categoryId });
 
+    const category = await Category.findById(categoryId);
+
+    if (!category) {
+      throw new Error("Category Not Found");
+    }
+
+    // @ts-ignore
+    category.products.push(newProduct._id);
+
+    await category.save();
     await newProduct.save();
 
     res.status(201).json({ message: "Product Created Successfully" });
@@ -70,10 +80,18 @@ export const createProduct = async (
 
 /**
  * @swagger
- * /edit-product/:productId:
+ * /edit-product/{productId}:
  *   put:
  *     summary: Edit a product
- *     description: This endpoint is used for editing a product.
+ *     description: This endpoint is used to edit a product.
+ *     parameters:
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         description: The ID of the product to edit
+ *         schema:
+ *           type: string
+ *         example: 680f59c92675fa9d8855982d
  *     requestBody:
  *       required: true
  *       content:
@@ -83,13 +101,16 @@ export const createProduct = async (
  *             properties:
  *               name:
  *                 type: string
- *                 example: food
- *               categoryId:
- *                 type: ObjectId
- *                 example: 680f59c92675fa9d8855982d
+ *                 example: "Food"
+ *               price:
+ *                 type: number
+ *                 example: 15.99
+ *               description:
+ *                 type: string
+ *                 example: "A delicious meal"
  *     responses:
  *       200:
- *         description: Category Edited Successfully
+ *         description: Product Edited Successfully
  *         content:
  *           application/json:
  *             schema:
@@ -97,11 +118,11 @@ export const createProduct = async (
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Category Edited Successfully"
- *                 user:
- *                   type: object
+ *                   example: "Product Edited Successfully"
  *       400:
- *         description: Bad request - Error editing category
+ *         description: Bad request - Missing required fields
+ *       404:
+ *         description: Product Not Found
  *       500:
  *         description: Internal server error
  */
@@ -109,10 +130,10 @@ export const editProduct = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { name, price, description, categoryId } = req.body;
+  const { name, price, description } = req.body;
   const { productId } = req.params;
 
-  if (!name || price || description || categoryId) {
+  if (!name || !price || !description) {
     throw new Error("Category name, price, description and id are required");
   }
 
@@ -123,16 +144,9 @@ export const editProduct = async (
       throw new Error("Product Not Found");
     }
 
-    if (categoryId) {
-      const category = await Category.findById(categoryId);
-
-      if (!category) throw new Error("Category Not Found");
-    }
-
     product.name = name || product.name;
     product.price = price || product.price;
     product.description = description || product.description;
-    product.categoryId = categoryId || product.categoryId;
 
     await product.save();
 
@@ -145,10 +159,18 @@ export const editProduct = async (
 
 /**
  * @swagger
- * /delete-product/:productId:
+ * /delete-product/{productId}:
  *   delete:
  *     summary: Delete a product
  *     description: This endpoint is used for deleting a product.
+ *     parameters:
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         description: The ID of the product to delete
+ *         schema:
+ *           type: string
+ *         example: 680f59c92675fa9d8855982d
  *     requestBody:
  *       required: false
  *     responses:
