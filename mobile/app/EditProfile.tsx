@@ -1,24 +1,71 @@
-import { Text, View, TextInput, TouchableOpacity, Image, ScrollView } from 'react-native';
-import React, { useState } from 'react';
-import * as ImagePicker from 'expo-image-picker'; // For image upload
-import { Ionicons } from '@expo/vector-icons'; // For icons (e.g., dropdown arrows)
-import { router } from 'expo-router';
+import {
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
+import React, { useState, useEffect } from "react";
+import * as ImagePicker from "expo-image-picker"; // For image upload
+import { Ionicons } from "@expo/vector-icons"; // For icons (e.g., dropdown arrows)
+import { router } from "expo-router";
+import { api } from "@/api";
+import { Alert } from "react-native";
+import Toast from "react-native-toast-message";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const EditProfile = () => {
   // State for form fields
-  const [name, setName] = useState('Adeagbo Josiah');
-  const [email, setEmail] = useState('jtechdevteam@gmail.com');
-  const [phone, setPhone] = useState('08087112167');
-  const [deliveryAddress, setdeliveryAddress] = useState('NO 2 Adegoke Bus Stop Orita Challenge Ibadan');
-  const [country, setCountry] = useState('Nigeria');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [deliveryAddress, setdeliveryAddress] = useState("");
+  const [country, setCountry] = useState("");
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const fetchDetails = async () => {
+    try {
+      const userId = await AsyncStorage.getItem("user_id");
+
+      if (!userId) {
+        console.log("User ID not found in AsyncStorage");
+        return;
+      }
+
+      const path = `user/fetch-user/${userId}`;
+
+      const response = await fetch("http://192.168.246.140:5000/api", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          path,
+        }),
+      });
+
+      console.log("data fetching...M");
+      const data = await response.json();
+
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchDetails();
+  }, []);
 
   // Function to handle profile image upload
   const pickImage = async () => {
     // Request permission to access the media library
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      alert('Sorry, we need camera roll permissions to make this work!');
+    if (status !== "granted") {
+      alert("Sorry, we need camera roll permissions to make this work!");
       return;
     }
 
@@ -36,10 +83,56 @@ const EditProfile = () => {
   };
 
   // Function to handle saving changes (you can add API call here)
-  const handleSaveChanges = () => {
-    console.log('Saving changes:', { name, email, phone, deliveryAddress, country, profileImage });
-    router.push('/(tabs)/account')
-    // Add your API call to save the updated profile data
+  const handleSaveChanges = async () => {
+    if (!name || !email || !phone || !deliveryAddress || !country) {
+      return Toast.show({
+        type: "error",
+        text1: "All fields must have a value",
+        position: "top",
+      });
+    }
+
+    setLoading(true);
+
+    try {
+      const userId = await AsyncStorage.getItem("user_id");
+
+      if (!userId) {
+        console.log("User ID not found in AsyncStorage");
+        return;
+      }
+
+      const response = await fetch(api(`user/edit-profile/${userId}`), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          phoneNumber: phone,
+          deliveryAddress,
+          country,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.message === "User Profile Edited Successfully") {
+        Toast.show({
+          type: "success",
+          text1: "Profile Edited Successfully",
+          position: "top",
+        });
+
+        router.push("/(tabs)/account");
+      }
+    } catch (error) {
+      console.error("Login Error:", error);
+      Alert.alert("Error", "An error occurred. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -60,10 +153,10 @@ const EditProfile = () => {
             source={
               profileImage
                 ? { uri: profileImage }
-                : require('../assets/icons/Avatars.png') // Replace with your default image
+                : require("../assets/icons/Avatars.png") // Replace with your default image
             }
             className="w-28 h-28 rounded-full border-2 border-gray-300"
-            resizeMode='contain'
+            resizeMode="contain"
           />
           {/* Camera Icon Overlay */}
           <View className="absolute bottom-0 right-0 bg-blue-600 rounded-full p-3">
@@ -97,7 +190,9 @@ const EditProfile = () => {
         />
 
         {/* phone */}
-        <Text className="text-gray-600 text-lg font-bold mb-2">Phone number</Text>
+        <Text className="text-gray-600 text-lg font-bold mb-2">
+          Phone number
+        </Text>
         <TextInput
           className="border border-gray-300 rounded-lg px-4 py-3 mb-4 text-base text-black"
           value={phone}
@@ -107,7 +202,9 @@ const EditProfile = () => {
         />
 
         {/* Date of Birth */}
-        <Text className="text-gray-600 text-lg font-bold mb-2">Delivery Address</Text>
+        <Text className="text-gray-600 text-lg font-bold mb-2">
+          Delivery Address
+        </Text>
         <View className="flex-row items-center border border-gray-300 rounded-lg px-4 py-3 mb-4">
           <TextInput
             className="flex-1 text-base text-black"
@@ -119,7 +216,9 @@ const EditProfile = () => {
         </View>
 
         {/* Country/Region */}
-        <Text className="text-gray-600 text-lg font-bold mb-2">Country/Region</Text>
+        <Text className="text-gray-600 text-lg font-bold mb-2">
+          Country/Region
+        </Text>
         <View className="flex-row items-center border border-gray-300 rounded-lg px-4 py-3 mb-6">
           <TextInput
             className="flex-1 text-base text-black"
@@ -135,7 +234,13 @@ const EditProfile = () => {
           className="bg-green-900 py-4 rounded-lg items-center mb-6"
           onPress={handleSaveChanges}
         >
-          <Text className="text-white text-base font-semibold">Save Changes</Text>
+          {loading ? (
+            <ActivityIndicator />
+          ) : (
+            <Text className="text-white text-base font-semibold">
+              Save Changes
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
     </ScrollView>

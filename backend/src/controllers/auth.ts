@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
 import { User } from "../models/user.model";
-import sendOTPToMail from "../services/sendOTP";
+import { sendOTP as sendOtpToMail, generateOTP } from "../services/sendOTP";
 
 dotenv.config();
 
@@ -79,19 +79,25 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const otp = generateOTP();
+
+    sendOtpToMail(email, otp);
+
     const newUser = new User({
       email,
       name,
       phoneNumber,
       deliveryAddress,
       password: hashedPassword,
+      otp: otp,
     });
 
     await newUser.save();
 
     res.status(201).json({
-      message: "User created successfully!",
-      user: { email: newUser.email, username: newUser.name },
+      message: "User registered successfully. Please verify your OTP.",
+      user_id: newUser._id,
+      otp_code: otp,
     });
   } catch (error) {
     console.error("Error during signup:", error);
@@ -148,25 +154,37 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     if (user) {
       const isPasswordValid = await bcrypt.compare(password, hashedPassword);
       if (!isPasswordValid) {
-        throw new Error("Invalid Credentials");
+        res.status(400).json({
+          message: "Incorrect password",
+        });
+      } else {
+        const token = jwt.sign(
+          { userId: user._id, username: user.name },
+          jwtSecret,
+          { expiresIn: "1h" }
+        );
+
+        res.status(200).json({
+          message: "Login successful",
+          token,
+          user: {
+            id: user._id,
+            full_name: user.name,
+            email: user.email,
+            phone_number: user.phoneNumber,
+            delivery_address: user.deliveryAddress,
+          },
+        });
       }
-
-      const token = jwt.sign(
-        { userId: user._id, username: user.name },
-        jwtSecret,
-        { expiresIn: "1h" }
-      );
-
-      res.status(200).json({
-        message: "Login successful",
-        token,
-      });
     } else {
-      throw new Error("Invalid Credentials");
+      res.status(404).json({
+        message: "User Not Found",
+      });
     }
   } catch (error) {
     console.error("Error during login:", error);
-    res.status(500).json({ message: error || "Server error", error });
+    // @ts-ignore
+    res.status(500).json({ message: error.message || "Server error", error });
   }
 };
 
@@ -209,19 +227,154 @@ export const sendOTP = async (req: Request, res: Response): Promise<void> => {
     const user = await User.findOne({ email });
 
     if (user) {
-      sendOTPToMail(email);
+      const otp = generateOTP();
+
+      sendOtpToMail(email, otp);
+
+      user.otp = otp;
+
+      await user.save();
 
       res.status(200).json({
-        message: "OTP sent successfully",
+        message:
+          "If this email is associated with Samstead, an OTP has been sent successfully.",
       });
     } else {
-      throw new Error("Invalid Credentials");
+      res.status(200).json({
+        message:
+          "If this email is associated with Samstead, an OTP has been sent successfully.",
+      });
+    }
+  } catch (error) {
+    console.error("Error during sending of otp:", error);
+    res.status(500).json({ message: error || "Server error", error });
+  }
+};
+
+/**
+ * @swagger
+ * /verify:
+ *   post:
+ *     summary: Verify OTP code sent to the user at forgot-password
+ *     description: This endpoint verifies a user's email via OTP.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: ObjectId
+ *                 example: 69209b93689020
+ *               otpCode:
+ *                 type: string
+ *                 example: 890378
+ *     responses:
+ *       200:
+ *         description: OTP verified successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: OTP verified successfully
+ *       400:
+ *         description: Verification failed. Please try again.
+ *       500:
+ *         description: Internal server error
+ */
+export const verify = async (req: Request, res: Response): Promise<void> => {
+  const { email, otpCode } = req.body;
+
+  try {
+    const user = await User.find({ email });
+
+    if (!user) {
+      // @ts-ignore
+      res.code = 404;
+      throw new Error("User does not exist");
+    }
+
+    // @ts-ignore
+    if (user && user.otp === otpCode) {
+      res.status(200).json({
+        message: "OTP verified successfully",
+      });
+    } else {
+      res.status(400).json({
+        message: "Verification failed. Please try again.",
+      });
     }
   } catch (error) {
     console.error("Error during login:", error);
     res.status(500).json({ message: error || "Server error", error });
   }
-};
+}; // For forgot password auth
+
+/**
+ * @swagger
+ * /verify-otp:
+ *   post:
+ *     summary: Verify OTP code sent to the user at signup
+ *     description: This endpoint verifies a user's email via OTP.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: ObjectId
+ *                 example: 69209b93689020
+ *               otpCode:
+ *                 type: string
+ *                 example: 890378
+ *     responses:
+ *       200:
+ *         description: OTP verified successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: OTP verified successfully
+ *       400:
+ *         description: Verification failed. Please try again.
+ *       500:
+ *         description: Internal server error
+ */
+export const verifyOTP = async (req: Request, res: Response): Promise<void> => {
+  const { userId, otpCode } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      // @ts-ignore
+      res.code = 404;
+      throw new Error("User does not exist");
+    }
+
+    if (user && user.otp === otpCode) {
+      res.status(200).json({
+        message: "OTP verified successfully",
+      });
+    } else {
+      res.status(400).json({
+        message: "Verification failed. Please try again.",
+      });
+    }
+  } catch (error) {
+    console.error("Error during login:", error);
+    res.status(500).json({ message: error || "Server error", error });
+  }
+}; // For signup auth
 
 /**
  * @swagger
@@ -265,14 +418,10 @@ export const setNewPassword = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { password, confirmPassword, email } = req.body;
+  const { password, email } = req.body;
 
   try {
     const user = await User.findOne({ email });
-
-    if (password !== confirmPassword) {
-      throw new Error("Passowrd does not match");
-    }
 
     if (user) {
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -287,7 +436,7 @@ export const setNewPassword = async (
       throw new Error("Invalid Credentials");
     }
   } catch (error) {
-    console.error("Error during login:", error);
+    console.error("Error during setting new password:", error);
     res.status(500).json({ message: error || "Server error", error });
   }
 };

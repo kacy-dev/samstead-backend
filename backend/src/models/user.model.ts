@@ -10,6 +10,8 @@ interface IUser extends Document {
   orders: object;
   role: string;
   profilePicture: string;
+  otp: string;
+  country: string;
 }
 
 const userSchema: Schema = new Schema<IUser>({
@@ -52,6 +54,13 @@ const userSchema: Schema = new Schema<IUser>({
   },
   profilePicture: {
     type: String,
+  },
+  otp: {
+    type: String,
+  },
+  country: {
+    type: String,
+    default: null,
   },
 });
 

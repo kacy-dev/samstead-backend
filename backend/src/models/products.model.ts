@@ -6,6 +6,7 @@ interface IProduct extends Document {
   price: number;
   description: string;
   image: string;
+  slashedPrice: number;
 }
 
 const productSchema: Schema = new Schema<IProduct>(
@@ -20,6 +21,10 @@ const productSchema: Schema = new Schema<IProduct>(
       required: true,
     },
     price: {
+      type: Number,
+      required: true,
+    },
+    slashedPrice: {
       type: Number,
       required: true,
     },

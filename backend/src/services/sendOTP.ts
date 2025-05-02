@@ -1,14 +1,12 @@
 import nodemailer from "nodemailer";
 
-const generateOTP = (): string => {
-  const otp = Math.floor(100000 + Math.random() + 900000);
+export const generateOTP = (): string => {
+  const otp = Math.floor(1000 + Math.random() * 9000);
 
   return otp.toString();
 };
 
-const sendOTP = async (email: string): Promise<void> => {
-  const otp = generateOTP;
-
+export const sendOTP = async (email: string, otp: string): Promise<void> => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -32,5 +30,3 @@ const sendOTP = async (email: string): Promise<void> => {
     console.log("Error sending OTP", error);
   }
 };
-
-export default sendOTP;

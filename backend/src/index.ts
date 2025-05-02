@@ -26,6 +26,6 @@ app.use("/api/user", userRoutes);
 
 setupSwagger(app);
 
-app.listen(port, () => {
+app.listen(5000, "0.0.0.0", () => {
   console.log(`Server running on port ${port}`);
 });

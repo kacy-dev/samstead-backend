@@ -210,3 +210,59 @@ export const deleteProduct = async (
     res.status(500).json({ message: "Server error", error });
   }
 };
+
+/**
+ * @swagger
+ * /fetch-products/{categoryId}:
+ *   delete:
+ *     summary: Fetch products
+ *     description: This endpoint is used for fetching products.
+ *     parameters:
+ *       - in: path
+ *         name: categoryId
+ *         required: true
+ *         description: The ID of the category to fetch products from.
+ *         schema:
+ *           type: string
+ *         example: 680f59c92675fa9d8855982d
+ *     requestBody:
+ *       required: false
+ *     responses:
+ *       200:
+ *         description: Products Fetched Successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Products Fetched Successfully"
+ *                 user:
+ *                   type: object
+ *       400:
+ *         description: Bad request - Error fetching product
+ *       500:
+ *         description: Internal server error
+ */
+export const fetchProducts = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { categoryId } = req.params;
+
+  if (!categoryId) {
+    throw new Error("Category id is required");
+  }
+
+  try {
+    const products = await Category.findById(categoryId).populate(
+      "-id name price description image slashedPrice"
+    );
+
+    res.status(200).json({ message: "Product Deleted Successfully", products });
+  } catch (error) {
+    console.error("Error editing product:", error);
+    res.status(500).json({ message: "Server error", error });
+  }
+};

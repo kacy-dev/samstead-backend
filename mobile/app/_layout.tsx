@@ -1,20 +1,24 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect, useState } from 'react';
-import 'react-native-reanimated';
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import {
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider,
+} from "@react-navigation/native";
+import { useFonts } from "expo-font";
+import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect, useState } from "react";
+import "react-native-reanimated";
 import "../global.css";
-import { useAuthStore } from '@/store/useAuthStore';
-import { RootSiblingParent } from 'react-native-root-siblings';
-import Toast from 'react-native-toast-message';
+import { useAuthStore } from "@/store/useAuthStore";
+import { RootSiblingParent } from "react-native-root-siblings";
+import Toast from "react-native-toast-message";
 
 SplashScreen.preventAutoHideAsync(); // Keep splash visible until fonts are loaded
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     ...FontAwesome.font,
   });
 
@@ -47,11 +51,9 @@ export default function RootLayout() {
   return <RootLayoutNav isSplashDone={false} />;
 }
 
-
 function RootLayoutNav({ isSplashDone }: { isSplashDone: boolean }) {
-
   return (
-      <RootSiblingParent>
+    <RootSiblingParent>
       <Stack initialRouteName={isSplashDone ? "(tabs)" : "Splash"}>
         {/* Splash Screen as initial route */}
         <Stack.Screen name="Splash" options={{ headerShown: false }} />
@@ -73,20 +75,27 @@ function RootLayoutNav({ isSplashDone }: { isSplashDone: boolean }) {
         <Stack.Screen name="Orders" options={{ headerShown: false }} />
         <Stack.Screen name="EditProfile" options={{ headerShown: false }} />
         <Stack.Screen name="Search" options={{ headerShown: false }} />
-        <Stack.Screen name="SubscriptionSuccess" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="SubscriptionSuccess"
+          options={{ headerShown: false }}
+        />
         <Stack.Screen name="ForgotPassword" options={{ headerShown: false }} />
         <Stack.Screen name="ResetPassword" options={{ headerShown: false }} />
-        <Stack.Screen name="ResetOtpVerification" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="ResetOtpVerification"
+          options={{ headerShown: false }}
+        />
         <Stack.Screen name="Notifications" options={{ headerShown: false }} />
         <Stack.Screen name="Support" options={{ headerShown: false }} />
         <Stack.Screen name="Faq" options={{ headerShown: false }} />
         <Stack.Screen name="TermsCondition" options={{ headerShown: false }} />
         <Stack.Screen name="DeliveryAgent" options={{ headerShown: false }} />
         <Stack.Screen name="AddressBook" options={{ headerShown: false }} />
+        <Stack.Screen name="PaystackWebView" options={{ headerShown: false }} />
         {/* Tabs group */}
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>
       <Toast />
-      </RootSiblingParent>
+    </RootSiblingParent>
   );
 }

@@ -171,3 +171,43 @@ export const deleteCategory = async (
     res.status(500).json({ message: "Server error", error });
   }
 };
+
+/**
+ * @swagger
+ * /fetch-categories:
+ *   get:
+ *     summary: Fetch all the available categories
+ *     description: This endpoint is used for fetching all the available categories.
+ *     responses:
+ *       200:
+ *         description: Categories Fetched Successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Category Fetched Successfully"
+ *                 user:
+ *                   type: object
+ *       400:
+ *         description: Bad request - Error fetching category
+ *       500:
+ *         description: Internal server error
+ */
+export const fetchCategories = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const categories = await Category.find({});
+
+    res
+      .status(200)
+      .json({ message: "Category fetched Successfully", data: categories });
+  } catch (error) {
+    console.error("Error fetching category:", error);
+    res.status(500).json({ message: "Server error", error });
+  }
+};
