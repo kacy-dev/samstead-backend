@@ -25,6 +25,7 @@ const EditProfile = () => {
   const [country, setCountry] = useState("");
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [imageUrl, setImageUrl] = useState("");
 
   const fetchDetails = async () => {
     try {
@@ -47,8 +48,6 @@ const EditProfile = () => {
       setPhone(data.data.phoneNumber.toString());
       setDeliveryAddress(data.data.deliveryAddress);
       setCountry(data.data.country);
-
-      // console.log(data);
     } catch (error) {
       console.log(error);
     }
@@ -100,6 +99,9 @@ const EditProfile = () => {
         return;
       }
 
+      await uploadImageToCloudinary();
+      console.log(imageUrl);
+
       const response = await fetch(api(`user/edit-profile/${userId}`), {
         method: "PUT",
         headers: {
@@ -111,6 +113,7 @@ const EditProfile = () => {
           phoneNumber: phone,
           deliveryAddress,
           country,
+          profilePicture: imageUrl,
         }),
       });
 
@@ -136,6 +139,33 @@ const EditProfile = () => {
       Alert.alert("Error", "An error occurred. Please try again later.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const uploadImageToCloudinary = async () => {
+    const formData = new FormData();
+
+    // @ts-ignore
+    formData.append("file", {
+      uri: profileImage,
+      type: "image/jpeg",
+      name: "upload.jpg",
+    });
+
+    formData.append("upload_preset", "samstead");
+    try {
+      const res = await fetch(
+        "https://api.cloudinary.com/v1_1/dtjyc6zzf/image/upload",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+      const data = await res.json();
+
+      setImageUrl(data.url);
+    } catch (err) {
+      console.error("Upload error:", err);
     }
   };
 

@@ -73,7 +73,8 @@ export const editProfile = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { name, email, phoneNumber, deliveryAddress, country } = req.body;
+  const { name, email, phoneNumber, deliveryAddress, country, profilePicture } =
+    req.body;
   const { userId } = req.params;
 
   if (!userId) {
@@ -91,6 +92,7 @@ export const editProfile = async (
       user.phoneNumber = phoneNumber || user.phoneNumber;
       user.deliveryAddress = deliveryAddress || user.deliveryAddress;
       user.country = country || user.country;
+      user.profilePicture = profilePicture || user.profilePicture;
 
       await user.save();
 
