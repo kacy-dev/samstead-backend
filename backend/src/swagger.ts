@@ -10,19 +10,19 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: "http://localhost:5000/api/auth",
+      url: "https://samstead.onrender.com/api/auth",
     },
     {
-      url: "http://localhost:5000/api/categories",
+      url: "https://samstead.onrender.com/api/categories",
     },
     {
-      url: "http://localhost:5000/api/paystack",
+      url: "https://samstead.onrender.com/api/paystack",
     },
     {
-      url: "http://localhost:5000/api/product",
+      url: "https://samstead.onrender.com/api/product",
     },
     {
-      url: "http://localhost:5000/api/user",
+      url: "https://samstead.onrender.com/api/user",
     },
   ],
 };

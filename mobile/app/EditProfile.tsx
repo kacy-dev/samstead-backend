@@ -39,14 +39,14 @@ const EditProfile = () => {
         method: "GET",
       });
 
-      // const data = await response.json();
-      console.log(response);
+      const data = await response.json();
+      console.log(data);
 
-      // setName(data.data.name);
-      // setEmail(data.data.email);
-      // setPhone(data.data.phone);
-      // setDeliveryAddress(data.data.deliveryAddress);
-      // setCountry(data.data.country);
+      setName(data.data.name);
+      setEmail(data.data.email);
+      setPhone(data.data.phoneNumber.toString());
+      setDeliveryAddress(data.data.deliveryAddress);
+      setCountry(data.data.country);
 
       // console.log(data);
     } catch (error) {
@@ -101,7 +101,7 @@ const EditProfile = () => {
       }
 
       const response = await fetch(api(`user/edit-profile/${userId}`), {
-        method: "POST",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
