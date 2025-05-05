@@ -25,7 +25,6 @@ const EditProfile = () => {
   const [country, setCountry] = useState("");
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [imageUrl, setImageUrl] = useState("");
 
   const fetchDetails = async () => {
     try {
@@ -41,13 +40,13 @@ const EditProfile = () => {
       });
 
       const data = await response.json();
-      console.log(data);
 
       setName(data.data.name);
       setEmail(data.data.email);
       setPhone(data.data.phoneNumber.toString());
       setDeliveryAddress(data.data.deliveryAddress);
       setCountry(data.data.country);
+      setProfileImage(data.data.profilePicture);
     } catch (error) {
       console.log(error);
     }
@@ -99,8 +98,7 @@ const EditProfile = () => {
         return;
       }
 
-      await uploadImageToCloudinary();
-      console.log(imageUrl);
+      const imageUrl = await uploadImageToCloudinary();
 
       const response = await fetch(api(`user/edit-profile/${userId}`), {
         method: "PUT",
@@ -163,7 +161,7 @@ const EditProfile = () => {
       );
       const data = await res.json();
 
-      setImageUrl(data.url);
+      return data.url;
     } catch (err) {
       console.error("Upload error:", err);
     }

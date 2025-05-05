@@ -1,71 +1,73 @@
-import React from "react";
-import { Alert, ActivityIndicator, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, Alert, View } from "react-native";
 import { WebView } from "react-native-webview";
 import { useRouter } from "expo-router";
+import { api } from "@/api"; // Custom API URL builder
 
-interface PaystackWebViewProps {
+interface Props {
   email: string;
   amount: number;
 }
 
-const PaystackWebView: React.FC<PaystackWebViewProps> = ({ email, amount }) => {
+const PaystackWebView: React.FC<Props> = ({ email, amount }) => {
   const router = useRouter();
-  const paystackPublicKey = "pk_test_d3a60265a49af403da62ebb911e30f155701b601";
+  const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
 
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <title>Pay with Paystack</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      </head>
-      <body>
-        <script src="https://js.paystack.co/v1/inline.js"></script>
-        <script type="text/javascript">
-          window.onload = function () {
-            var handler = PaystackPop.setup({
-              key: '${paystackPublicKey}',
-              email: '${email}',
-              amount: ${amount * 100},
-              callback: function (response) {
-                window.ReactNativeWebView.postMessage(
-                  JSON.stringify({ status: 'success', reference: response.reference })
-                );
-              },
-              onClose: function () {
-                window.ReactNativeWebView.postMessage(
-                  JSON.stringify({ status: 'cancelled' })
-                );
-              },
-            });
-            handler.openIframe();
-          };
-        </script>
-      </body>
-    </html>
-  `;
+  useEffect(() => {
+    const fetchCheckoutUrl = async () => {
+      try {
+        const res = await fetch(api("paystack/initialize"), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email,
+            amount: amount * 100, // Convert to kobo
+          }),
+        });
 
-  const handleMessage = (event: any) => {
-    try {
-      const data = JSON.parse(event.nativeEvent.data);
-      if (data.status === "success") {
-        console.log("Payment successful with reference:", data.reference);
-        router.push("/SubscriptionSuccess");
-      } else if (data.status === "cancelled") {
-        Alert.alert("Payment Cancelled");
+        const data = await res.json();
+        console.log("Paystack Checkout URL:", data.checkoutUrl);
+        setCheckoutUrl(data.checkoutUrl);
+      } catch (e) {
+        console.log("Checkout init error:", e);
+        Alert.alert("Error", "Unable to initiate Paystack transaction.");
       }
-    } catch (error) {
-      console.error("Failed to handle message from WebView:", error);
+    };
+
+    fetchCheckoutUrl();
+  }, []);
+
+  const handleNavigation = (navState: any) => {
+    const { url } = navState;
+    console.log("Navigated to:", url);
+
+    // Watch for callback URL
+    if (url.includes("example.com/verify")) {
+      router.push("/SubscriptionSuccess");
     }
   };
 
+  if (!checkoutUrl) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
   return (
     <WebView
-      originWhitelist={["*"]}
-      source={{ html: htmlContent }}
+      source={{ uri: checkoutUrl }}
       javaScriptEnabled={true}
       domStorageEnabled={true}
-      onMessage={handleMessage}
+      onNavigationStateChange={handleNavigation}
+      onShouldStartLoadWithRequest={(request) => {
+        if (request.url.includes("example.com/verify")) {
+          router.push("/SubscriptionSuccess");
+          return false; // Stop WebView from continuing to load
+        }
+        return true;
+      }}
       startInLoadingState={true}
       renderLoading={() => (
         <View

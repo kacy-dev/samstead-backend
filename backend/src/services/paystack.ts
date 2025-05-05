@@ -10,7 +10,12 @@ export const createTransaction = async (email: string, amount: number) => {
   try {
     const response = await axios.post(
       `${PAYSTACK_URL}/transaction/initialize`,
-      { email, amount, channels: ["card"] },
+      {
+        email,
+        amount,
+        channels: ["card"],
+        callback_url: "https://example.com/verify",
+      },
       {
         headers: {
           Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
