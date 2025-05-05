@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, View } from "react-native";
 import { WebView } from "react-native-webview";
 import { useRouter } from "expo-router";
-import { api } from "@/api"; // Custom API URL builder
+import { api } from "@/api";
 
 interface Props {
   email: string;
@@ -20,14 +20,14 @@ const PaystackWebView: React.FC<Props> = ({ email, amount }) => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            email,
-            amount: amount * 100, // Convert to kobo
+            email: "believeosawaru@gmail.com",
+            amount: 1000 * 100,
           }),
         });
 
         const data = await res.json();
-        console.log("Paystack Checkout URL:", data.checkoutUrl);
-        setCheckoutUrl(data.checkoutUrl);
+        console.log(data.result.data.authorization_url);
+        setCheckoutUrl(data.result.data.authorization_url);
       } catch (e) {
         console.log("Checkout init error:", e);
         Alert.alert("Error", "Unable to initiate Paystack transaction.");
@@ -43,7 +43,15 @@ const PaystackWebView: React.FC<Props> = ({ email, amount }) => {
 
     // Watch for callback URL
     if (url.includes("example.com/verify")) {
-      router.push("/SubscriptionSuccess");
+      router.push({
+        pathname: "/SubscriptionSuccess",
+        params: {
+          name: "John Doe",
+          amount,
+          reference: "1234567890",
+          paymentTime: new Date().toLocaleString(),
+        },
+      });
     }
   };
 
@@ -64,7 +72,7 @@ const PaystackWebView: React.FC<Props> = ({ email, amount }) => {
       onShouldStartLoadWithRequest={(request) => {
         if (request.url.includes("example.com/verify")) {
           router.push("/SubscriptionSuccess");
-          return false; // Stop WebView from continuing to load
+          return false;
         }
         return true;
       }}

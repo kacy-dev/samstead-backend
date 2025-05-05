@@ -1,6 +1,6 @@
-import { Text, View, Image, TouchableOpacity } from 'react-native'
-import React from 'react'
-import { router } from 'expo-router'
+import { Text, View, Image, TouchableOpacity } from "react-native";
+import React from "react";
+import { router } from "expo-router";
 
 const SubscriptionSuccess = () => {
   return (
@@ -9,10 +9,10 @@ const SubscriptionSuccess = () => {
         {/* Success Icon */}
         <View className="items-center mb-4">
           <Image
-            source={require('../assets/icons/success.png')}
+            source={require("../assets/icons/success.png")}
             className="w-20 h-20 "
             resizeMode="contain"
-          /> 
+          />
         </View>
 
         {/* Success Text */}
@@ -20,7 +20,7 @@ const SubscriptionSuccess = () => {
           Subscription Success!
         </Text>
         <Text className="text-center text-xl font-bold text-black mb-4">
-          NGN 30,000
+          NGN 1,000
         </Text>
 
         <View className="h-px bg-gray-200 my-2" />
@@ -43,27 +43,35 @@ const SubscriptionSuccess = () => {
 
         <View className="flex-row justify-between my-1 mb-6">
           <Text className="text-sm text-gray-500">Sender Name</Text>
-          <Text className="text-sm font-semibold text-gray-800">Antonio Roberto</Text>
+          <Text className="text-sm font-semibold text-gray-800">
+            Antonio Roberto
+          </Text>
         </View>
 
         <View className="flex-row justify-between my-1 mb-6">
           <Text className="text-sm text-gray-500">Amount</Text>
-          <Text className="text-sm font-semibold text-gray-800">NGN 30,000.00</Text>
+          <Text className="text-sm font-semibold text-gray-800">
+            NGN 500.00
+          </Text>
         </View>
 
         <View className="flex-row justify-between my-1 mb-6">
           <Text className="text-sm text-gray-500">Admin Fee</Text>
-          <Text className="text-sm font-semibold text-gray-800">NGN 500.00</Text>
+          <Text className="text-sm font-semibold text-gray-800">
+            NGN 500.00
+          </Text>
         </View>
       </View>
       <TouchableOpacity
-            className="bg-green-800 py-4 mt-12 rounded-md mb-3 w-full"
-            onPress={() => router.push('/LoginScreen')}
-        >
-            <Text className="text-center text-white font-semibold">Back to Login</Text>
-        </TouchableOpacity>
+        className="bg-green-800 py-4 mt-12 rounded-md mb-3 w-full"
+        onPress={() => router.push("/LoginScreen")}
+      >
+        <Text className="text-center text-white font-semibold">
+          Back to Login
+        </Text>
+      </TouchableOpacity>
     </View>
-  )
-}
+  );
+};
 
-export default SubscriptionSuccess
+export default SubscriptionSuccess;
