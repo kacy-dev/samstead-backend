@@ -104,7 +104,7 @@ export const editProfile = async (
 
 /**
  * @swagger
- * /edit-profile:
+ * /fetch-profile:
  *   get:
  *     summary: Fetch a user's profile
  *     description: This endpoint is used for fetching a user's profile.
