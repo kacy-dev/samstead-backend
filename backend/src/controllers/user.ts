@@ -144,7 +144,7 @@ export const editProfile = async (
  */
 export const fetchUser = async (req: Request, res: Response): Promise<void> => {
   // @ts-ignore
-  const { userId } = req.body;
+  const { userId } = req.params;
 
   if (!userId) {
     throw new Error("401 Unauthorized");

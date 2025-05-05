@@ -1,18 +1,15 @@
 import React from "react";
 import { Alert, ActivityIndicator, View } from "react-native";
 import { WebView } from "react-native-webview";
+import { useRouter } from "expo-router";
 
 interface PaystackWebViewProps {
   email: string;
-  amount: number; // Amount in Naira
-  onSuccess?: (reference: string) => void;
+  amount: number;
 }
 
-const PaystackWebView: React.FC<PaystackWebViewProps> = ({
-  email,
-  amount,
-  onSuccess,
-}) => {
+const PaystackWebView: React.FC<PaystackWebViewProps> = ({ email, amount }) => {
+  const router = useRouter();
   const paystackPublicKey = "pk_test_d3a60265a49af403da62ebb911e30f155701b601";
 
   const htmlContent = `
@@ -53,7 +50,7 @@ const PaystackWebView: React.FC<PaystackWebViewProps> = ({
       const data = JSON.parse(event.nativeEvent.data);
       if (data.status === "success") {
         console.log("Payment successful with reference:", data.reference);
-        onSuccess?.(data.reference);
+        router.push("/SubscriptionSuccess");
       } else if (data.status === "cancelled") {
         Alert.alert("Payment Cancelled");
       }

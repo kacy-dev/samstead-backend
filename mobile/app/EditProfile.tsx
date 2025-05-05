@@ -21,7 +21,7 @@ const EditProfile = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [deliveryAddress, setdeliveryAddress] = useState("");
+  const [deliveryAddress, setDeliveryAddress] = useState("");
   const [country, setCountry] = useState("");
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -35,22 +35,20 @@ const EditProfile = () => {
         return;
       }
 
-      const path = `user/fetch-user/${userId}`;
-
-      const response = await fetch("http://192.168.246.140:5000/api", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          path,
-        }),
+      const response = await fetch(api(`user/fetch-user/${userId}`), {
+        method: "GET",
       });
 
-      console.log("data fetching...M");
-      const data = await response.json();
+      // const data = await response.json();
+      console.log(response);
 
-      console.log(data);
+      // setName(data.data.name);
+      // setEmail(data.data.email);
+      // setPhone(data.data.phone);
+      // setDeliveryAddress(data.data.deliveryAddress);
+      // setCountry(data.data.country);
+
+      // console.log(data);
     } catch (error) {
       console.log(error);
     }
@@ -126,6 +124,12 @@ const EditProfile = () => {
         });
 
         router.push("/(tabs)/account");
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "There was an error editing profile",
+          position: "top",
+        });
       }
     } catch (error) {
       console.error("Login Error:", error);
@@ -209,7 +213,7 @@ const EditProfile = () => {
           <TextInput
             className="flex-1 text-base text-black"
             value={deliveryAddress}
-            onChangeText={setdeliveryAddress}
+            onChangeText={setDeliveryAddress}
             placeholder="Update Address"
             placeholderTextColor="gray"
           />

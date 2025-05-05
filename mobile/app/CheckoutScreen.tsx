@@ -18,82 +18,70 @@ const CheckoutScreen = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
-  const [reference, setReference] = useState<string | null>(null);
+  // const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
+  // const [reference, setReference] = useState<string | null>(null);
 
   // Initialize Payment Process
-  const handleConfirm = async () => {
-    setLoading(true);
+  // const handleConfirm = async () => {
+  //   setLoading(true);
 
-    try {
-      const response = await axios.post(api("paystack/initialize"), {
-        email, // Replace with real user email
-        amount: 5000, // 5000 kobo = ₦50
-        name,
-      });
+  //   try {
+  //     const response = await axios.post(api("paystack/initialize"), {
+  //       email, // Replace with real user email
+  //       amount: 5000, // 5000 kobo = ₦50
+  //       name,
+  //     });
 
-      const { authorization_url, reference } = response.data.result.data;
-      setReference(reference);
-      setCheckoutUrl(authorization_url); // Launch Paystack WebView
-    } catch (error) {
-      console.log("Payment initialization error:", error);
-      alert("Failed to initialize payment.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     const { authorization_url, reference } = response.data.result.data;
+  //     setReference(reference);
+  //     setCheckoutUrl(authorization_url); // Launch Paystack WebView
+  //   } catch (error) {
+  //     console.log("Payment initialization error:", error);
+  //     alert("Failed to initialize payment.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
-  // Handle navigation state change in the WebView
-  const handleWebViewNavigationStateChange = async (navState: any) => {
-    const { url } = navState;
-    console.log("Navigating to URL:", url);
+  // // Handle navigation state change in the WebView
+  // const handleWebViewNavigationStateChange = async (navState: any) => {
+  //   const { url } = navState;
+  //   console.log("Navigating to URL:", url);
 
-    // Paystack callback URL (make sure your redirect URL is correctly set in Paystack)
-    if (url.includes("paystack.com")) {
-      // Look for the success redirect URL from Paystack
-      if (url.includes("status=success")) {
-        // Payment was successful
-        alert("Payment successful!");
+  //   // Paystack callback URL (make sure your redirect URL is correctly set in Paystack)
+  //   if (url.includes("paystack.com")) {
+  //     // Look for the success redirect URL from Paystack
+  //     if (url.includes("status=success")) {
+  //       // Payment was successful
+  //       alert("Payment successful!");
 
-        try {
-          // Verify the payment with your backend
-          const verifyRes = await axios.post(api("paystack/verify"), {
-            reference,
-          });
+  //       try {
+  //         // Verify the payment with your backend
+  //         const verifyRes = await axios.post(api("paystack/verify"), {
+  //           reference,
+  //         });
 
-          if (verifyRes.data.status === "success") {
-            alert("Payment confirmed!");
-            router.push("/SubscriptionSuccess"); // Redirect to success page
-          } else {
-            alert("Payment verification failed");
-          }
-        } catch (error) {
-          console.error("Verification error:", error);
-          alert("Failed to verify payment.");
-        }
-      } else {
-        // Payment failed or was cancelled
-        alert("Payment failed or canceled.");
-      }
-    }
-  };
+  //         if (verifyRes.data.status === "success") {
+  //           alert("Payment confirmed!");
+  //           router.push("/SubscriptionSuccess"); // Redirect to success page
+  //         } else {
+  //           alert("Payment verification failed");
+  //         }
+  //       } catch (error) {
+  //         console.error("Verification error:", error);
+  //         alert("Failed to verify payment.");
+  //       }
+  //     } else {
+  //       // Payment failed or was cancelled
+  //       alert("Payment failed or canceled.");
+  //     }
+  //   }
+  // };
 
   // Cancel the payment process and go back
   const handleCancel = () => {
     router.back(); // Go back to the previous screen
   };
-
-  if (checkoutUrl) {
-    return (
-      <WebView
-        source={{ uri: checkoutUrl }}
-        onNavigationStateChange={handleWebViewNavigationStateChange}
-        startInLoadingState
-        javaScriptEnabled
-        domStorageEnabled
-      />
-    );
-  }
 
   // Show payment form if WebView is not yet loaded
   return (
@@ -128,9 +116,16 @@ const CheckoutScreen = () => {
       />
 
       <TouchableOpacity
-        onPress={handleConfirm}
+        onPress={() => {
+          router.push({
+            pathname: "/PaystackWebView",
+            params: {
+              email,
+              amount: 1000,
+            },
+          });
+        }}
         className="bg-green-800 py-4 rounded-md mb-3"
-        disabled={loading}
       >
         {loading ? (
           <ActivityIndicator color="white" />
