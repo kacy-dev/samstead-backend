@@ -153,7 +153,12 @@ export const fetchUser = async (req: Request, res: Response): Promise<void> => {
   }
 
   try {
-    const user = await User.findById(userId);
+    const user = await User.findById(userId)
+      .populate({
+        path: "orders.products.productId",
+        model: "Product",
+      })
+      .exec();
 
     if (!user) {
       res.status(400).json({ message: "Error Fetching Profile" });
