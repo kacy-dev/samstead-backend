@@ -20,6 +20,8 @@ const PaystackWebView = () => {
   const [reference, setReference] = useState("");
   const [products, setProdcuts] = useState("");
 
+  console.log(products);
+
   useEffect(() => {
     if (typeof product === "string") {
       const products = JSON.parse(product);

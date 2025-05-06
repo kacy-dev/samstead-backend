@@ -41,7 +41,7 @@ const userSchema: Schema = new Schema<IUser>({
   },
   orders: [
     {
-      orderId: { type: String, required: true },
+      orderId: { type: String },
       products: [
         {
           productId: {
