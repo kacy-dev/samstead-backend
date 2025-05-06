@@ -1,10 +1,9 @@
 import mongoose, { Document, Schema } from "mongoose";
-
 import { Types } from "mongoose";
 
 interface Order {
   orderId: string;
-  product: Types.ObjectId[];
+  products: { productId: Types.ObjectId; quantity: number }[];
   status: "pending" | "completed" | "shipped";
   orderDate: Date;
 }
@@ -24,10 +23,7 @@ interface IUser extends Document {
 }
 
 const userSchema: Schema = new Schema<IUser>({
-  name: {
-    type: String,
-    required: true,
-  },
+  name: { type: String, required: true },
   email: {
     type: String,
     required: true,
@@ -35,18 +31,9 @@ const userSchema: Schema = new Schema<IUser>({
     lowercase: true,
     trim: true,
   },
-  phoneNumber: {
-    type: Number,
-    required: true,
-  },
-  deliveryAddress: {
-    type: String,
-    required: true,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
+  phoneNumber: { type: Number, required: true },
+  deliveryAddress: { type: String, required: true },
+  password: { type: String, required: true },
   subscription: {
     type: String,
     enum: ["Premium", "Elite", "None"],
@@ -54,7 +41,23 @@ const userSchema: Schema = new Schema<IUser>({
   },
   orders: [
     {
-      default: [],
+      orderId: { type: String, required: true },
+      products: [
+        {
+          productId: {
+            type: Schema.Types.ObjectId,
+            ref: "Product",
+            required: true,
+          },
+          quantity: { type: Number, required: true },
+        },
+      ],
+      status: {
+        type: String,
+        enum: ["pending", "completed", "shipped"],
+        default: "pending",
+      },
+      orderDate: { type: Date, default: Date.now },
     },
   ],
   role: {
@@ -62,16 +65,9 @@ const userSchema: Schema = new Schema<IUser>({
     enum: ["admin", "user"],
     default: "user",
   },
-  profilePicture: {
-    type: String,
-  },
-  otp: {
-    type: String,
-  },
-  country: {
-    type: String,
-    default: null,
-  },
+  profilePicture: { type: String },
+  otp: { type: String },
+  country: { type: String, default: null },
 });
 
 const User = mongoose.model<IUser>("User", userSchema);

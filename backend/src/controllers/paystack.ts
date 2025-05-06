@@ -119,13 +119,18 @@ export const verify = async (req: Request, res: Response): Promise<void> => {
       if (category === "cart") {
         const user = await User.findById(id);
 
-        const productIds = Array.isArray(product)
-          ? product.map((p: any) => p._id)
-          : [];
+        if (!Array.isArray(product) || product.length === 0) {
+          throw new Error("Product list is required");
+        }
+
+        const productsWithQuantities = product.map((p: any) => ({
+          productId: p._id,
+          quantity: p.quantity,
+        }));
 
         const order: Order = {
           orderId,
-          product: productIds,
+          products: productsWithQuantities,
           status: "pending",
           orderDate: new Date(),
         };
