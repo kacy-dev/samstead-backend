@@ -52,9 +52,11 @@ const userSchema: Schema = new Schema<IUser>({
     enum: ["Premium", "Elite", "None"],
     default: "None",
   },
-  orders: {
-    default: [],
-  },
+  orders: [
+    {
+      default: [],
+    },
+  ],
   role: {
     type: String,
     enum: ["admin", "user"],
