@@ -120,25 +120,39 @@ export const verify = async (req: Request, res: Response): Promise<void> => {
         const user = await User.findById(id);
 
         if (!Array.isArray(product) || product.length === 0) {
-          throw new Error("Product list is required");
+          throw new Error(
+            "Products are required and must be a non-empty array"
+          );
         }
 
-        const productsWithQuantities = product.map((p: any) => ({
-          productId: p._id,
-          quantity: p.quantity,
-        }));
+        const validProducts = product
+          .filter(
+            (p: any) =>
+              p._id && typeof p.quantity === "number" && p.quantity > 0
+          )
+          .map((p: any) => ({
+            productId: p._id,
+            quantity: p.quantity,
+          }));
+
+        if (validProducts.length !== product.length) {
+          throw new Error("One or more products are missing quantity or _id");
+        }
+
+        if (!orderId) {
+          throw new Error("orderId is required");
+        }
 
         const order: Order = {
           orderId,
-          products: productsWithQuantities,
+          products: validProducts,
           status: "pending",
           orderDate: new Date(),
         };
 
         user?.orders.push(order);
 
-        // @ts-ignore
-        await user.save();
+        await user?.save();
 
         res.status(200).json({ message: "Payment successful", result });
       } else if (category === "subs") {
