@@ -3,55 +3,102 @@ import { ActivityIndicator, Alert, View } from "react-native";
 import { WebView } from "react-native-webview";
 import { useRouter } from "expo-router";
 import { api } from "@/api";
+import { useLocalSearchParams } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-interface Props {
-  email: string;
-  amount: number;
-}
+const PaystackWebView = () => {
+  const { email: expectedEmail } = useLocalSearchParams();
+  const { amount: expectedAmount } = useLocalSearchParams();
+  const { for: expectedFor } = useLocalSearchParams();
+  const { paymentMethod } = useLocalSearchParams();
+  const [email, setEmail] = useState("");
+  const [amount, setAmount] = useState("");
+  const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
+  const [reference, setReference] = useState("");
 
-const PaystackWebView: React.FC<Props> = ({ email, amount }) => {
-  const router = useRouter();
-  const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
+  const fetchCheckoutUrl = async () => {
+    try {
+      const name = await AsyncStorage.getItem("user_name");
+      const address = await AsyncStorage.getItem("user_address");
+
+      setName(name || "");
+      setAddress(address || "");
+
+      const res = await fetch(api("paystack/initialize"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: expectedEmail,
+          amount: Number(expectedAmount) * 100,
+        }),
+      });
+
+      const data = await res.json();
+
+      setCheckoutUrl(data.result.data.authorization_url);
+      setReference(data.result.data.reference);
+    } catch (e) {
+      console.log("Checkout init error:", e);
+      Alert.alert("Error", "Unable to initiate Paystack transaction.");
+    }
+  };
 
   useEffect(() => {
-    const fetchCheckoutUrl = async () => {
-      try {
-        const res = await fetch(api("paystack/initialize"), {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: "believeosawaru@gmail.com",
-            amount: 1000 * 100,
-          }),
-        });
+    if (expectedEmail && typeof expectedEmail === "string") {
+      setEmail(expectedEmail);
+    }
+  }, [expectedEmail]);
 
-        const data = await res.json();
-        console.log(data.result.data.authorization_url);
-        setCheckoutUrl(data.result.data.authorization_url);
-      } catch (e) {
-        console.log("Checkout init error:", e);
-        Alert.alert("Error", "Unable to initiate Paystack transaction.");
-      }
-    };
+  useEffect(() => {
+    if (expectedAmount && typeof expectedAmount === "string") {
+      setAmount(expectedAmount);
+    }
+  }, [expectedAmount]);
 
+  useEffect(() => {
     fetchCheckoutUrl();
   }, []);
 
+  const handleVerify = async () => {
+    try {
+      if (expectedFor === "subs") {
+        router.push({
+          pathname: "/SubscriptionSuccess",
+          params: {
+            name: "John Doe",
+            amount,
+            reference: "1234567890",
+            paymentTime: new Date().toLocaleString(),
+          },
+        });
+      } else {
+        console.log(reference);
+        const response = await fetch(api(`paystack/verify/${reference}`), {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            category: expectedFor,
+          }),
+        });
+
+        const data = await response.json();
+
+        console.log(data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const router = useRouter();
+  const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
+
   const handleNavigation = (navState: any) => {
     const { url } = navState;
-    console.log("Navigated to:", url);
 
-    // Watch for callback URL
     if (url.includes("example.com/verify")) {
-      router.push({
-        pathname: "/SubscriptionSuccess",
-        params: {
-          name: "John Doe",
-          amount,
-          reference: "1234567890",
-          paymentTime: new Date().toLocaleString(),
-        },
-      });
+      handleVerify();
     }
   };
 
@@ -71,7 +118,7 @@ const PaystackWebView: React.FC<Props> = ({ email, amount }) => {
       onNavigationStateChange={handleNavigation}
       onShouldStartLoadWithRequest={(request) => {
         if (request.url.includes("example.com/verify")) {
-          router.push("/SubscriptionSuccess");
+          handleVerify();
           return false;
         }
         return true;
