@@ -176,6 +176,8 @@ export const verify = async (req: Request, res: Response): Promise<void> => {
           );
         }
 
+        await user?.save();
+
         res.status(200).json({ message: "Payment successful", result });
       }
     } else {

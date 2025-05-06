@@ -24,13 +24,11 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { api } from "@/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
 const account = () => {
   const logout = useAuthStore((state) => state.logout);
 
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<UserProfile | null>(null);
-
 
   const fetchUserDetails = async () => {
     setLoading(true);
@@ -40,11 +38,11 @@ const account = () => {
         console.log("User ID not found");
         return;
       }
-  
+
       const response = await fetch(api(`user/fetch-user/${userId}`), {
         method: "GET",
       });
-  
+
       const data = await response.json();
       console.log(data);
       setUser(data.data);
@@ -54,7 +52,6 @@ const account = () => {
       setLoading(false);
     }
   };
-  
 
   useEffect(() => {
     fetchUserDetails();
@@ -69,9 +66,9 @@ const account = () => {
     deliveryAddress?: string;
     country?: string;
     profilePicture?: string;
+    subscription: string;
+    subscriptionExpiryDate: string;
   }
-  
-  
 
   return (
     <ScrollView className="flex-1 p-4" style={{ backgroundColor: "#f6f6f6" }}>
@@ -88,7 +85,7 @@ const account = () => {
 
       {/* Profile */}
       <View className="flex-row items-center mt-4 gap-4">
-      <Image
+        <Image
           source={
             user?.profilePicture
               ? { uri: user.profilePicture }
@@ -98,7 +95,9 @@ const account = () => {
         />
         <View>
           <Text className="text-lg font-bold">{user?.name}</Text>
-          <Text className="font-semibold text-sm text-gray-500">{user?.phoneNumber}</Text>
+          <Text className="font-semibold text-sm text-gray-500">
+            {user?.phoneNumber}
+          </Text>
 
           <View
             className="bg-green-100 items-center rounded-full"
@@ -130,9 +129,9 @@ const account = () => {
               <FontAwesome6 name="crown" size={20} color="#10b981" />
             </View>
             <View style={{ marginLeft: 10 }}>
-              <Text className="font-bold">Elite Membership</Text>
+              <Text className="font-bold">{user?.subscription}</Text>
               <Text className="font-regular text-gray-500 text-sm">
-                Valid until Dec 31, 2025
+                Valid until {user?.subscriptionExpiryDate}
               </Text>
             </View>
           </View>
@@ -242,7 +241,6 @@ const account = () => {
               console.log("Error during logout:", err);
             }
           }}
-          
         >
           <View className="flex-row items-center gap-4">
             <MaterialIcons name="lock" size={20} color="red" />
