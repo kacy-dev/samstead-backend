@@ -30,9 +30,8 @@ export const createTransaction = async (email: string, amount: number) => {
 
 export const verifyTransaction = async (reference: string) => {
   try {
-    const response = await axios.post(
+    const response = await axios.get(
       `${PAYSTACK_URL}/transaction/verify/${reference}`,
-      {},
       {
         headers: {
           Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
