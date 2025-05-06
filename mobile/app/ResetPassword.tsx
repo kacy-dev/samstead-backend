@@ -127,7 +127,7 @@ const ResetPassword = () => {
           onPress={handleResetPassword}
         >
           <Text className="text-white text-center text-lg font-semibold text-base">
-            Login
+            Reset
           </Text>
         </TouchableOpacity>
       )}

@@ -1,4 +1,4 @@
-import { View, Text, Image, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, Image, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
@@ -7,11 +7,29 @@ import { router } from "expo-router";
 import Header from "@/components/Header";
 import Toast from "react-native-root-toast";
 import { api } from "@/api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 export default function TabOneScreen() {
   const [search, setSearch] = useState("");
   const [dailDeals, setDailDeals] = useState([]);
   const [recommendedProducts, setRecommendedProducts] = useState([]);
+  const [user, setUser] = useState<UserProfile | null>(null);
+    const [loading, setLoading] = useState(false);
+
+  interface UserProfile {
+    name: string;
+    email: string;
+    phoneNumber: string;
+    deliveryAddress?: string;
+    country?: string;
+    profilePicture?: string;
+  }
+
+    useEffect(() => {
+      fetchUserDetails();
+    }, []);
+  
 
   const fetchDailyDeals = async () => {
     try {
@@ -27,6 +45,42 @@ export default function TabOneScreen() {
       console.log(error);
     }
   };
+
+  
+  
+  const fetchUserDetails = async () => {
+    setLoading(true);
+    try {
+      const userId = await AsyncStorage.getItem("user_id");
+  
+      if (!userId) {
+        console.log("User ID not found. Redirecting to login.");
+        router.replace("/LoginScreen"); // 👈 redirect to login
+        return;
+      }
+  
+      const response = await fetch(api(`user/fetch-user/${userId}`), {
+        method: "GET",
+      });
+  
+      const data = await response.json();
+      console.log(data);
+  
+      if (!data?.data) {
+        console.log("Invalid user data. Redirecting to login.");
+        await AsyncStorage.removeItem("user_id"); // clean up
+        router.replace("/LoginScreen");
+        return;
+      }
+  
+      setUser(data.data);
+    } catch (error) {
+      console.log("Error fetching user details:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
 
   const fetchRecommendedProducts = async () => {
     try {
@@ -47,6 +101,9 @@ export default function TabOneScreen() {
     fetchDailyDeals();
     fetchRecommendedProducts();
   }, []);
+
+  if (loading) return <ActivityIndicator />;
+
 
   // mock/products.ts
   const dailyDeals = [
@@ -127,11 +184,12 @@ export default function TabOneScreen() {
         <Ionicons name="location" size={20} color={"green"} />
         <Text
           className="text-black-600 font-semibold text-lg"
-          style={{ fontSize: 18 }}
+          style={{ fontSize: 16 }}
+          numberOfLines={1}
         >
           Deliver to:{" "}
-          <Text className="font-bold text-black">
-            123 Victoria Island, Lagos
+          <Text className="font-bold text-black" numberOfLines={1}>
+          {user?.deliveryAddress}
           </Text>
         </Text>
       </View>
@@ -208,7 +266,10 @@ export default function TabOneScreen() {
           {dailyDeals.map((item, index) => (
             <TouchableOpacity
               onPress={() => {
-                useProductStore.getState().setSelectedProduct(item);
+                useProductStore.getState().setSelectedProduct({
+                  ...item,
+                  totalPrice: parseFloat(item.price).toFixed(2),
+                });
                 router.push("/ProductDetails");
               }}
               key={index}
@@ -243,7 +304,11 @@ export default function TabOneScreen() {
                   className="p-2 rounded-lg w-10 h-12 justify-center items-center"
                   style={{ backgroundColor: "#058044" }}
                   onPress={() => {
-                    useProductStore.getState().addToCart(item);
+                    useProductStore.getState().addToCart({
+                      ...item,
+                      quantity: 1,
+                      totalPrice: parseFloat(item.price).toFixed(2),
+                    });
                     Toast.show(`${item.name} added to cart`, {
                       duration: Toast.durations.SHORT,
                       position: Toast.positions.BOTTOM,
@@ -288,7 +353,10 @@ export default function TabOneScreen() {
           {RecommendedProducts.map((item, index) => (
             <TouchableOpacity
               onPress={() => {
-                useProductStore.getState().setSelectedProduct(item);
+                useProductStore.getState().setSelectedProduct({
+                  ...item,
+                  totalPrice: parseFloat(item.price).toFixed(2),
+                });
                 router.push("/ProductDetails");
               }}
               key={index}
@@ -316,7 +384,10 @@ export default function TabOneScreen() {
                   className="p-2 rounded-lg w-10 h-12 justify-center items-center"
                   style={{ backgroundColor: "#058044" }}
                   onPress={() => {
-                    useProductStore.getState().addToCart(item);
+                    useProductStore.getState().addToCart({
+                      ...item,
+                      totalPrice: parseFloat(item.price).toFixed(2),
+                    });
                     Toast.show(`${item.name} added to cart`, {
                       duration: Toast.durations.SHORT,
                       position: Toast.positions.BOTTOM,

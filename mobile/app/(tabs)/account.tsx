@@ -24,41 +24,54 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { api } from "@/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+
 const account = () => {
   const logout = useAuthStore((state) => state.logout);
 
-  const [user, setUser] = useState({});
   const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState<UserProfile | null>(null);
+
 
   const fetchUserDetails = async () => {
     setLoading(true);
-
     try {
-      const token = await AsyncStorage.getItem("auth_token");
-
-      const response = await fetch(api("user/fetch-user"), {
+      const userId = await AsyncStorage.getItem("user_id");
+      if (!userId) {
+        console.log("User ID not found");
+        return;
+      }
+  
+      const response = await fetch(api(`user/fetch-user/${userId}`), {
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
-
+  
       const data = await response.json();
-
       console.log(data);
       setUser(data.data);
     } catch (error) {
-      console.log(error);
+      console.log("Error fetching user details:", error);
     } finally {
       setLoading(false);
     }
   };
+  
 
   useEffect(() => {
     fetchUserDetails();
   }, []);
 
   if (loading) return <ActivityIndicator />;
+
+  interface UserProfile {
+    name: string;
+    email: string;
+    phoneNumber: string;
+    deliveryAddress?: string;
+    country?: string;
+    profilePicture?: string;
+  }
+  
+  
 
   return (
     <ScrollView className="flex-1 p-4" style={{ backgroundColor: "#f6f6f6" }}>
@@ -75,15 +88,18 @@ const account = () => {
 
       {/* Profile */}
       <View className="flex-row items-center mt-4 gap-4">
-        <Image
-          source={{ uri: "https://i.pravatar.cc/100" }}
+      <Image
+          source={
+            user?.profilePicture
+              ? { uri: user.profilePicture }
+              : require("../../assets/icons/Avatars.png") // fallback image
+          }
           className="w-20 h-20 rounded-full"
         />
         <View>
-          <Text className="text-lg font-bold">Sarah Johnson</Text>
-          <Text className="font-semibold text-sm text-gray-500">
-            +234 801 234 5678
-          </Text>
+          <Text className="text-lg font-bold">{user?.name}</Text>
+          <Text className="font-semibold text-sm text-gray-500">{user?.phoneNumber}</Text>
+
           <View
             className="bg-green-100 items-center rounded-full"
             style={{ padding: 1, width: 88 }}
@@ -217,7 +233,16 @@ const account = () => {
         </TouchableOpacity>
         <TouchableOpacity
           className="flex-row justify-between items-center mb-2"
-          onPress={() => router.replace("/Onboarding")}
+          onPress={async () => {
+            try {
+              await AsyncStorage.removeItem("user_id");
+              logout(); // clear state
+              router.replace("/Onboarding"); // navigate to onboarding/login screen
+            } catch (err) {
+              console.log("Error during logout:", err);
+            }
+          }}
+          
         >
           <View className="flex-row items-center gap-4">
             <MaterialIcons name="lock" size={20} color="red" />

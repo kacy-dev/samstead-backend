@@ -48,16 +48,15 @@ export default function RootLayout() {
 
   if (!loaded || !isAppReady) return null; // Block UI until ready
 
-  return <RootLayoutNav isSplashDone={false} />;
+  return <RootLayoutNav />;
 }
 
-function RootLayoutNav({ isSplashDone }: { isSplashDone: boolean }) {
+function RootLayoutNav() {
   return (
     <RootSiblingParent>
-      <Stack initialRouteName={isSplashDone ? "(tabs)" : "Splash"}>
+      <Stack initialRouteName="Splash">
         {/* Splash Screen as initial route */}
         <Stack.Screen name="Splash" options={{ headerShown: false }} />
-
         {/* Other screens */}
         <Stack.Screen name="Onboarding" options={{ headerShown: false }} />
         <Stack.Screen name="SignupScreen" options={{ headerShown: false }} />
