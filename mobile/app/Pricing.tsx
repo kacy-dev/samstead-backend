@@ -63,7 +63,14 @@ const Pricing = () => {
         <TouchableOpacity
           className="bg-green-700 mt-8 rounded-lg py-4"
           style={{ width: "90%", alignSelf: "center" }}
-          onPress={() => router.push("/CheckoutScreen")}
+          onPress={() => {
+            router.push({
+              pathname: "/CheckoutScreen",
+              params: {
+                amount: 1000,
+              },
+            });
+          }}
         >
           <Text className="text-center text-white font-semibold">
             Select Premium
@@ -106,7 +113,14 @@ const Pricing = () => {
         <TouchableOpacity
           className="bg-purple-700 mt-8 rounded-lg py-4"
           style={{ width: "90%", alignSelf: "center" }}
-          onPress={() => router.push("/CheckoutScreen")}
+          onPress={() => {
+            router.push({
+              pathname: "/CheckoutScreen",
+              params: {
+                amount: 3000,
+              },
+            });
+          }}
         >
           <Text className="text-center text-white font-semibold">
             Select Premium

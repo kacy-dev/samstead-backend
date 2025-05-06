@@ -15,6 +15,7 @@ interface IUser extends Document {
   phoneNumber: number;
   deliveryAddress: string;
   subscription: string;
+  subscriptionExpiryDate: Date | null;
   orders: Order[];
   role: string;
   profilePicture: string;
@@ -37,8 +38,10 @@ const userSchema: Schema = new Schema<IUser>({
   subscription: {
     type: String,
     enum: ["Premium", "Elite", "None"],
+
     default: "None",
   },
+  subscriptionExpiryDate: { type: Date, default: null },
   orders: [
     {
       orderId: { type: String },

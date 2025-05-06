@@ -1,8 +1,11 @@
 import { Text, View, Image, TouchableOpacity } from "react-native";
 import React from "react";
 import { router } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 
 const SubscriptionSuccess = () => {
+  const { name, amount, reference, paymentTime } = useLocalSearchParams();
+
   return (
     <View className="flex-1 bg-white justify-center items-center px-4">
       <View className="w-full bg-white rounded-2xl p-6 ">
@@ -20,7 +23,7 @@ const SubscriptionSuccess = () => {
           Subscription Success!
         </Text>
         <Text className="text-center text-xl font-bold text-black mb-4">
-          NGN 1,000
+          NGN {amount}
         </Text>
 
         <View className="h-px bg-gray-200 my-2" />
@@ -28,12 +31,12 @@ const SubscriptionSuccess = () => {
         {/* Details */}
         <View className="flex-row justify-between my-1 mb-6">
           <Text className="text-sm text-gray-500">Ref Number</Text>
-          <Text className="text-sm text-gray-800">000085752257</Text>
+          <Text className="text-sm text-gray-800">{reference}</Text>
         </View>
 
         <View className="flex-row justify-between my-1 mb-6">
           <Text className="text-sm text-gray-500">Payment Time</Text>
-          <Text className="text-sm text-gray-800">25-02-2023, 13:22:16</Text>
+          <Text className="text-sm text-gray-800">{paymentTime}</Text>
         </View>
 
         <View className="flex-row justify-between my-1 mb-6">
@@ -43,15 +46,13 @@ const SubscriptionSuccess = () => {
 
         <View className="flex-row justify-between my-1 mb-6">
           <Text className="text-sm text-gray-500">Sender Name</Text>
-          <Text className="text-sm font-semibold text-gray-800">
-            Antonio Roberto
-          </Text>
+          <Text className="text-sm font-semibold text-gray-800">{name}</Text>
         </View>
 
         <View className="flex-row justify-between my-1 mb-6">
           <Text className="text-sm text-gray-500">Amount</Text>
           <Text className="text-sm font-semibold text-gray-800">
-            NGN 500.00
+            NGN {amount}
           </Text>
         </View>
 

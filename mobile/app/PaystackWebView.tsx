@@ -20,15 +20,13 @@ const PaystackWebView = () => {
   const [reference, setReference] = useState("");
   const [products, setProdcuts] = useState("");
 
-  console.log(products);
-
   useEffect(() => {
     if (typeof product === "string") {
       const products = JSON.parse(product);
 
       setProdcuts(products);
     } else {
-      console.error("Reference is not a string");
+      console.log("Reference is not a string");
     }
   }, []);
 
@@ -80,15 +78,31 @@ const PaystackWebView = () => {
   const handleVerify = async () => {
     try {
       if (expectedFor === "subs") {
-        router.push({
-          pathname: "/SubscriptionSuccess",
-          params: {
-            name: "John Doe",
+        const response = await fetch(api(`paystack/verify/${reference}`), {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            category: expectedFor,
+            id,
             amount,
-            reference: "1234567890",
-            paymentTime: new Date().toLocaleString(),
-          },
+          }),
         });
+
+        const data = await response.json();
+
+        console.log(data);
+
+        if (data.message === "Payment successful") {
+          router.push({
+            pathname: "/SubscriptionSuccess",
+            params: {
+              name,
+              amount,
+              reference: data.result.data.reference,
+              paymentTime: data.result.data.created_at.toLocaleString(),
+            },
+          });
+        }
       } else {
         try {
           const transactionId =
@@ -112,6 +126,8 @@ const PaystackWebView = () => {
           const data = await response.json();
 
           if (data.message === "Payment successful") {
+            setReference("");
+
             router.push({
               pathname: "/Success",
               params: {

@@ -7,7 +7,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import { WebView } from "react-native-webview";
@@ -18,6 +18,7 @@ const CheckoutScreen = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const { amount } = useLocalSearchParams();
   // const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
   // const [reference, setReference] = useState<string | null>(null);
 
@@ -121,7 +122,8 @@ const CheckoutScreen = () => {
             pathname: "/PaystackWebView",
             params: {
               email,
-              amount: 1000,
+              amount,
+              for: "subs",
             },
           });
         }}

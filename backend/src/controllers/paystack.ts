@@ -106,7 +106,7 @@ export const initialize = async (
  */
 export const verify = async (req: Request, res: Response): Promise<void> => {
   const { reference } = req.params;
-  const { category, id, orderId, product } = req.body;
+  const { category, id, orderId, product, amount } = req.body;
 
   if (!reference) {
     throw new Error("Transaction reference is required");
@@ -156,6 +156,26 @@ export const verify = async (req: Request, res: Response): Promise<void> => {
 
         res.status(200).json({ message: "Payment successful", result });
       } else if (category === "subs") {
+        const user = await User.findById(id);
+
+        if (!user) {
+          throw new Error("User not found");
+        }
+
+        if (amount === "1000") {
+          user.subscription = "Premium";
+
+          user.subscriptionExpiryDate = new Date(
+            Date.now() + 30 * 24 * 60 * 60 * 1000
+          );
+        } else if (amount === "3000") {
+          user.subscription = "Elite";
+
+          user.subscriptionExpiryDate = new Date(
+            Date.now() + 30 * 24 * 60 * 60 * 1000
+          );
+        }
+
         res.status(200).json({ message: "Payment successful", result });
       }
     } else {
