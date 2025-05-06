@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 interface Product {
   name: string;
@@ -13,6 +13,7 @@ interface Product {
   oldPrice?: string;
   quantity?: number;
   totalPrice: string;
+  _id: string;
 }
 
 interface ProductStore {
@@ -33,16 +34,27 @@ export const useProductStore = create<ProductStore>((set) => ({
   cart: [],
   addToCart: (product) =>
     set((state) => {
-      const existingIndex = state.cart.findIndex((p) => p.name === product.name);
-      const updatedProduct = { ...product, totalPrice: (parseFloat(product.price) * (product.quantity || 1)).toString() };
-  
+      const existingIndex = state.cart.findIndex(
+        (p) => p.name === product.name
+      );
+      const updatedProduct = {
+        ...product,
+        totalPrice: (
+          parseFloat(product.price) * (product.quantity || 1)
+        ).toString(),
+      };
+
       if (existingIndex !== -1) {
         const updatedCart = [...state.cart];
-        updatedCart[existingIndex].quantity = (updatedCart[existingIndex].quantity || 1) + 1;
-        updatedCart[existingIndex].totalPrice = (parseFloat(updatedCart[existingIndex].price) * updatedCart[existingIndex].quantity).toString();
+        updatedCart[existingIndex].quantity =
+          (updatedCart[existingIndex].quantity || 1) + 1;
+        updatedCart[existingIndex].totalPrice = (
+          parseFloat(updatedCart[existingIndex].price) *
+          updatedCart[existingIndex].quantity
+        ).toString();
         return { cart: updatedCart };
       }
-  
+
       return {
         cart: [...state.cart, updatedProduct],
       };
@@ -53,23 +65,27 @@ export const useProductStore = create<ProductStore>((set) => ({
       cart: state.cart.filter((_, i) => i !== index),
     })),
 
-    increaseQuantity: (index) =>
-      set((state) => {
-        const updatedCart = [...state.cart];
-        updatedCart[index].quantity = (updatedCart[index].quantity || 1) + 1;
-        updatedCart[index].totalPrice = (parseFloat(updatedCart[index].price) * updatedCart[index].quantity).toString(); // Recalculate totalPrice
-        return { cart: updatedCart };
-      }),
+  increaseQuantity: (index) =>
+    set((state) => {
+      const updatedCart = [...state.cart];
+      updatedCart[index].quantity = (updatedCart[index].quantity || 1) + 1;
+      updatedCart[index].totalPrice = (
+        parseFloat(updatedCart[index].price) * updatedCart[index].quantity
+      ).toString(); // Recalculate totalPrice
+      return { cart: updatedCart };
+    }),
 
-    decreaseQuantity: (index) =>
-      set((state) => {
-        const updatedCart = [...state.cart];
-        if ((updatedCart[index].quantity || 1) > 1) {
-          updatedCart[index].quantity! -= 1;
-          updatedCart[index].totalPrice = (parseFloat(updatedCart[index].price) * updatedCart[index].quantity!).toString(); // Recalculate totalPrice
-        } else {
-          updatedCart.splice(index, 1); // Remove product if quantity reaches 1
-        }
-        return { cart: updatedCart };
-      }),
+  decreaseQuantity: (index) =>
+    set((state) => {
+      const updatedCart = [...state.cart];
+      if ((updatedCart[index].quantity || 1) > 1) {
+        updatedCart[index].quantity! -= 1;
+        updatedCart[index].totalPrice = (
+          parseFloat(updatedCart[index].price) * updatedCart[index].quantity!
+        ).toString(); // Recalculate totalPrice
+      } else {
+        updatedCart.splice(index, 1); // Remove product if quantity reaches 1
+      }
+      return { cart: updatedCart };
+    }),
 }));

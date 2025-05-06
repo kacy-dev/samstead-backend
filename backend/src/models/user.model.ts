@@ -1,5 +1,14 @@
 import mongoose, { Document, Schema } from "mongoose";
 
+import { Types } from "mongoose";
+
+interface Order {
+  orderId: string;
+  product: Types.ObjectId[];
+  status: "pending" | "completed" | "shipped";
+  orderDate: Date;
+}
+
 interface IUser extends Document {
   name: string;
   email: string;
@@ -7,7 +16,7 @@ interface IUser extends Document {
   phoneNumber: number;
   deliveryAddress: string;
   subscription: string;
-  orders: object;
+  orders: Order[];
   role: string;
   profilePicture: string;
   otp: string;
@@ -44,7 +53,6 @@ const userSchema: Schema = new Schema<IUser>({
     default: "None",
   },
   orders: {
-    type: Array,
     default: [],
   },
   role: {
@@ -66,4 +74,4 @@ const userSchema: Schema = new Schema<IUser>({
 
 const User = mongoose.model<IUser>("User", userSchema);
 
-export { User, IUser };
+export { User, IUser, Order };

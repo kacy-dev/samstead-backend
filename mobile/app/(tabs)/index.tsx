@@ -1,4 +1,11 @@
-import { View, Text, Image, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
@@ -9,13 +16,12 @@ import Toast from "react-native-root-toast";
 import { api } from "@/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
 export default function TabOneScreen() {
   const [search, setSearch] = useState("");
   const [dailDeals, setDailDeals] = useState([]);
   const [recommendedProducts, setRecommendedProducts] = useState([]);
   const [user, setUser] = useState<UserProfile | null>(null);
-    const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   interface UserProfile {
     name: string;
@@ -26,10 +32,9 @@ export default function TabOneScreen() {
     profilePicture?: string;
   }
 
-    useEffect(() => {
-      fetchUserDetails();
-    }, []);
-  
+  useEffect(() => {
+    fetchUserDetails();
+  }, []);
 
   const fetchDailyDeals = async () => {
     try {
@@ -46,33 +51,31 @@ export default function TabOneScreen() {
     }
   };
 
-  
-  
   const fetchUserDetails = async () => {
     setLoading(true);
     try {
       const userId = await AsyncStorage.getItem("user_id");
-  
+
       if (!userId) {
         console.log("User ID not found. Redirecting to login.");
         router.replace("/LoginScreen"); // 👈 redirect to login
         return;
       }
-  
+
       const response = await fetch(api(`user/fetch-user/${userId}`), {
         method: "GET",
       });
-  
+
       const data = await response.json();
       console.log(data);
-  
+
       if (!data?.data) {
         console.log("Invalid user data. Redirecting to login.");
         await AsyncStorage.removeItem("user_id"); // clean up
         router.replace("/LoginScreen");
         return;
       }
-  
+
       setUser(data.data);
     } catch (error) {
       console.log("Error fetching user details:", error);
@@ -80,7 +83,6 @@ export default function TabOneScreen() {
       setLoading(false);
     }
   };
-  
 
   const fetchRecommendedProducts = async () => {
     try {
@@ -104,7 +106,6 @@ export default function TabOneScreen() {
 
   if (loading) return <ActivityIndicator />;
 
-
   // mock/products.ts
   const dailyDeals = [
     {
@@ -119,6 +120,7 @@ export default function TabOneScreen() {
       protein: "1.1g",
       carbohydrates: "10g",
       vitaminC: "100mg",
+      _id: "93703hye8bswnviks",
     },
     {
       name: "Bell Peppers",
@@ -132,6 +134,7 @@ export default function TabOneScreen() {
       protein: "1.1g",
       carbohydrates: "10g",
       vitaminC: "100mg",
+      _id: "9379hye8bhgsgviks",
     },
     {
       name: "Potatoes",
@@ -145,6 +148,7 @@ export default function TabOneScreen() {
       protein: "1.1g",
       carbohydrates: "10g",
       vitaminC: "100mg",
+      _id: "93789he8bswhviks",
     },
   ];
 
@@ -160,6 +164,7 @@ export default function TabOneScreen() {
       protein: "1.1g",
       carbohydrates: "10g",
       vitaminC: "100mg",
+      _id: "98470dbhpw820uhdv39",
     },
     {
       name: "Irish Potatoes",
@@ -172,6 +177,7 @@ export default function TabOneScreen() {
       protein: "1.1g",
       carbohydrates: "10g",
       vitaminC: "100mg",
+      _id: "98996dbhpw820udhj39",
     },
   ];
 
@@ -189,7 +195,7 @@ export default function TabOneScreen() {
         >
           Deliver to:{" "}
           <Text className="font-bold text-black" numberOfLines={1}>
-          {user?.deliveryAddress}
+            {user?.deliveryAddress}
           </Text>
         </Text>
       </View>

@@ -300,6 +300,7 @@ const Checkout = () => {
                 amount: total,
                 for: "cart",
                 paymentMethod,
+                product: cartItems,
               },
             });
           }}

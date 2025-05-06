@@ -11,19 +11,34 @@ const PaystackWebView = () => {
   const { amount: expectedAmount } = useLocalSearchParams();
   const { for: expectedFor } = useLocalSearchParams();
   const { paymentMethod } = useLocalSearchParams();
+  const { product } = useLocalSearchParams();
   const [email, setEmail] = useState("");
   const [amount, setAmount] = useState("");
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
+  const [id, setId] = useState("");
   const [reference, setReference] = useState("");
+  const [products, setProdcuts] = useState("");
+
+  useEffect(() => {
+    if (typeof product === "string") {
+      const products = JSON.parse(product);
+
+      setProdcuts(products);
+    } else {
+      console.error("Reference is not a string");
+    }
+  }, []);
 
   const fetchCheckoutUrl = async () => {
     try {
       const name = await AsyncStorage.getItem("user_name");
       const address = await AsyncStorage.getItem("user_address");
+      const id = await AsyncStorage.getItem("user_id");
 
       setName(name || "");
       setAddress(address || "");
+      setId(id || "");
 
       const res = await fetch(api("paystack/initialize"), {
         method: "POST",
@@ -35,7 +50,7 @@ const PaystackWebView = () => {
       });
 
       const data = await res.json();
-
+      console.log(data.result.data.authorization_url);
       setCheckoutUrl(data.result.data.authorization_url);
       setReference(data.result.data.reference);
     } catch (e) {
@@ -73,18 +88,48 @@ const PaystackWebView = () => {
           },
         });
       } else {
-        console.log(reference);
-        const response = await fetch(api(`paystack/verify/${reference}`), {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            category: expectedFor,
-          }),
-        });
+        try {
+          const transactionId =
+            "TXN" + Math.floor(100000 + Math.random() * 900000);
+          const now = new Date();
+          const transactionDate = now.toLocaleDateString();
+          const transactionTime = now.toLocaleTimeString();
+          const recipientName = name;
 
-        const data = await response.json();
+          const response = await fetch(api(`paystack/verify/${reference}`), {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              category: expectedFor,
+              id,
+              orderId: transactionId,
+              product: products,
+            }),
+          });
 
-        console.log(data);
+          const data = await response.json();
+
+          if (data.message === "Payment successful") {
+            router.push({
+              pathname: "/Success",
+              params: {
+                total: amount,
+                paymentMethod,
+                transactionId,
+                transactionDate,
+                transactionTime,
+                recipientName,
+                address,
+              },
+            });
+          } else {
+            Alert.alert(
+              "Error Verifying Payment: Please contact admin support"
+            );
+          }
+        } catch (error) {
+          console.error("Error verifying payment:", error);
+        }
       }
     } catch (error) {
       console.log(error);

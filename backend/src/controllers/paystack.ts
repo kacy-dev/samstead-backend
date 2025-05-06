@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-import { User } from "../models/user.model";
+import { User, Order } from "../models/user.model";
 import { createTransaction, verifyTransaction } from "../services/paystack";
 
 /**
@@ -106,16 +106,42 @@ export const initialize = async (
  */
 export const verify = async (req: Request, res: Response): Promise<void> => {
   const { reference } = req.params;
-  const { category } = req.body;
+  const { category, id, orderId, product } = req.body;
 
   if (!reference) {
     throw new Error("Transaction reference is required");
   }
 
   try {
-    const result = await verifyTransaction(reference);
+    if (category && id) {
+      const result = await verifyTransaction(reference);
 
-    res.status(200).json({ message: "Payment successful", result });
+      if (category === "cart") {
+        const user = await User.findById(id);
+
+        const productIds = Array.isArray(product)
+          ? product.map((p: any) => p._id)
+          : [];
+
+        const order: Order = {
+          orderId,
+          product: productIds,
+          status: "pending",
+          orderDate: new Date(),
+        };
+
+        user?.orders.push(order);
+
+        // @ts-ignore
+        await user.save();
+
+        res.status(200).json({ message: "Payment successful", result });
+      } else if (category === "subs") {
+        res.status(200).json({ message: "Payment successful", result });
+      }
+    } else {
+      res.status(404).json({ message: "Category and ID not found" });
+    }
   } catch (error) {
     console.error("Error during payment:", error);
     res.status(500).json({ message: "Server error", error });
