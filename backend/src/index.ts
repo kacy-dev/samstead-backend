@@ -1,31 +1,14 @@
-import express, { Application } from "express";
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
+import app from './app';
+import mongoDBConnection from './config/db_config';
 
-import authRoutes from "./routes/auth";
-import categoryRoutes from "./routes/categories";
-import paystackRoutes from "./routes/paystack";
-import productRoutes from "./routes/products";
-import userRoutes from "./routes/user";
-
-import connectDB from "./db";
-import { setupSwagger } from "./swagger";
 
 dotenv.config();
 
-connectDB();
+const PORT = process.env.PORT || 5000;
 
-const app: Application = express();
-const port = process.env.PORT || 5000;
 
-app.use(express.json());
-app.use("/api/auth", authRoutes);
-app.use("/api/categories", categoryRoutes);
-app.use("/api/paystack", paystackRoutes);
-app.use("/api/product", productRoutes);
-app.use("/api/user", userRoutes);
-
-setupSwagger(app);
-
-app.listen(5000, "0.0.0.0", () => {
-  console.log(`Server running on port ${port}`);
-});
+mongoDBConnection();
+app.listen(() => {
+    console.log(`Server is running at http://localhost:${PORT}`)
+})
