@@ -8,10 +8,16 @@ import {
 import { protectAdmin } from '../../middlewares/auth_middleware';
 
 const router = express.Router();
+/**
+ * @swagger
+ * tags:
+ *   name: Admin
+ *   description: Admin management and authentication
+ */
 
 /**
  * @swagger
- * /admin/register:
+ * /api/auth/admin/register:
  *   post:
  *     summary: Register a new admin
  *     tags: [Admin]
@@ -37,13 +43,13 @@ const router = express.Router();
  *       201:
  *         description: Admin registered successfully
  *       400:
- *         description: Bad Request
+ *         description: Bad request
  */
 router.post('/admin/register', registerAdmin);
 
 /**
  * @swagger
- * /admin/verify-otp:
+ * /api/auth/admin/verify-otp:
  *   post:
  *     summary: Verify OTP for admin account
  *     tags: [Admin]
@@ -59,12 +65,11 @@ router.post('/admin/register', registerAdmin);
  *             properties:
  *               email:
  *                 type: string
- *                 format: email
  *               otp:
  *                 type: string
  *     responses:
  *       200:
- *         description: OTP verified successfully
+ *         description: OTP verified
  *       401:
  *         description: Invalid OTP
  */
@@ -72,7 +77,7 @@ router.post('/admin/verify-otp', verifyOTP);
 
 /**
  * @swagger
- * /admin/login:
+ * /api/auth/admin/login:
  *   post:
  *     summary: Admin login
  *     tags: [Admin]
@@ -101,7 +106,7 @@ router.post('/admin/login', loginAdmin);
 
 /**
  * @swagger
- * /admin/dashboard:
+ * /api/auth/admin/dashboard:
  *   get:
  *     summary: Get admin dashboard (Protected)
  *     tags: [Admin]
