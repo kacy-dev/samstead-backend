@@ -29,7 +29,6 @@ app.use((req: Request, res: Response) => {
 
 
 // Error handling middleware
-// Note: your errorHandler should have (err, req, res, next) signature
 app.use(errorHandler);
 
 export default app;
