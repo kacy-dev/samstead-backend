@@ -2,8 +2,8 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import Admin, { IAdmin } from '../../models/auth/Admin_model';
-import generateOtp from '../../utils/otp_generator';
-import { sendEmail } from '../../config/mailer_config';
+import { generateOtp } from '../../utils/otp_generator';
+import { sendAdminRegistrationEmail } from '../../config/mailer_config';
 import { ERROR_CODES, STATUS_CODES } from '../../utils/error_codes';
 
 const generateJWT = (adminId: string, role: string): string => {
@@ -23,7 +23,7 @@ export const registerAdmin = async (
   const { username, email, password } = req.body;
 
   try {
-    const existingAdmin = await Admin.findOne({ email });
+    const existingAdmin = await Admin.findOne({});
     if (existingAdmin) {
       res.status(STATUS_CODES.BAD_REQUEST).json({
         message: ERROR_CODES.ADMIN_EXISTS.message,
@@ -48,7 +48,7 @@ export const registerAdmin = async (
 
     await newAdmin.save();
 
-    await sendEmail(email, 'Verify Your Account', otp, username, 'registration');
+    await sendAdminRegistrationEmail(email, username, otp);
 
     res.status(STATUS_CODES.OK).json({
       message: 'Admin registration successful. OTP has been sent to your email.',
@@ -187,6 +187,6 @@ export const getAdminDashboard = async (
     ): Promise<void> => {
   res.status(STATUS_CODES.OK).json({
     message: 'Welcome to the Admin dashboard',
-    admin: req.user,
+    admin: req.admin,
   });
 };

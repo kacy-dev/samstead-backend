@@ -21,7 +21,7 @@ export const ERROR_CODES = {
     },
     ADMIN_EXISTS: { 
         code: 1004, 
-        message: "Admin Fetched Successfully"
+        message: "Can't register as Admin, Multiple Admins is Prohibited"
     },
     ADMIN_NOT_FOUND: { 
         code: 1005, 
