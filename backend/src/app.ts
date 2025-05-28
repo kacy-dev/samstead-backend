@@ -4,6 +4,7 @@ import cors from 'cors';
 import { setupSwagger } from './docs/swagger_options';
 import { errorHandler } from './middlewares/error_handler';
 import admin_route from './routes/auth/admin_route';
+import plan_route from './routes/products/plan_route';
 
 // const app = express();
 
@@ -19,6 +20,7 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.use('/api/auth', admin_route);
+app.use('/api', plan_route);
 
 setupSwagger(app);
 
