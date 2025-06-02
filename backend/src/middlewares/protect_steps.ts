@@ -3,43 +3,63 @@ import User from '../models/auth/User_model';
 import { STATUS_CODES, ERROR_CODES } from '../utils/error_codes';
 
 export const ensureVerified = async (req: Request, res: Response, next: NextFunction) => {
-    if (!req.userData) {
-      const user = await User.findById(req.user?.id);
-      if (!user?.isActive) {
-        return res.status(STATUS_CODES.UNAUTHORIZED).json({
-          code: ERROR_CODES.UNAUTHORIZED.code,
-          message: 'Verify your account before proceeding.',
-        });
-      }
-      req.userData = user;
-    }
-    next();
-  };
-  
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email });
 
-  export const ensurePlanSelected = async (req: Request, res: Response, next: NextFunction) => {
-    const user = req.userData ?? await User.findById(req.user?.id);
-    if (!user?.selectedPlan) {
+    if (!user || !user.isActive) {
+      return res.status(STATUS_CODES.UNAUTHORIZED).json({
+        code: ERROR_CODES.UNAUTHORIZED.code,
+        message: 'Verify your account before proceeding.',
+      });
+    }
+
+    next();
+  } catch (error) {
+    console.error('ensureVerified error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+  
+export const ensurePlanSelected = async (req: Request, res: Response, next: NextFunction) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user || !user.selectedPlan) {
       return res.status(STATUS_CODES.FORBIDDEN).json({
         code: ERROR_CODES.UNAUTHORIZED.code,
         message: 'Select a subscription plan before making payment.',
       });
     }
-    req.userData = user;
+
     next();
-  };
+  } catch (error) {
+    console.error('ensurePlanSelected error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
   
-  export const ensurePaymentComplete = async (req: Request, res: Response, next: NextFunction) => {
-    const user = req.userData ?? await User.findById(req.user?.id);
-    if (!user?.isPaid) {
+export const ensurePaymentComplete = async (req: Request, res: Response, next: NextFunction) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user || !user.isPaid) {
       return res.status(STATUS_CODES.FORBIDDEN).json({
         code: ERROR_CODES.UNAUTHORIZED.code,
         message: 'Complete your payment to continue.',
       });
     }
-    req.userData = user;
+
     next();
-  };
+  } catch (error) {
+    console.error('ensurePaymentComplete error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
 
 
 export const checkOnboardingComplete = async (req: Request, res: Response, next: NextFunction) => {
@@ -78,7 +98,6 @@ export const checkOnboardingComplete = async (req: Request, res: Response, next:
       });
     }
 
-    // All checks passed, proceed to login
     next();
   } catch (error) {
     console.error('Onboarding middleware error:', error);

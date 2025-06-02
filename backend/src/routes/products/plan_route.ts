@@ -236,6 +236,6 @@ router.delete('/delete-plan/:planId', protectAdmin, deletePlan);
  *                   example: Could not select plan. Please try again.
  */
 
-router.post('/select-plan', ensureVerified,  selectSubscriptionPlan)
+router.post('/select-plan', ensureVerified, selectSubscriptionPlan)
 
 export default router;

@@ -69,8 +69,7 @@ export const getAllPlans = async (_req: Request, res: Response): Promise<void> =
     }
   };
   
-
-  
+ 
   export const getPlanById = async (req: Request, res: Response): Promise<void> => {
     try {
       const { planId } = req.params;
@@ -162,61 +161,65 @@ export const getAllPlans = async (_req: Request, res: Response): Promise<void> =
   };
 
 
-
-//   This section controllers the selection of plans  ====== Part of user onboarding steps
-
-
 export const selectSubscriptionPlan = async (req: Request, res: Response) => {
-    const { planId } = req.body;
-    const userId = req.user?.id;
-  
-    if (!planId || !mongoose.Types.ObjectId.isValid(planId)) {
-      return res.status(STATUS_CODES.BAD_REQUEST).json({
-        code: ERROR_CODES.MISSING_FIELDS.code,
-        message: 'Please select a valid plan to continue.',
+  const { planId, email } = req.body;
+
+  console.log(req.body);
+
+  if (!planId) {
+    return res.status(STATUS_CODES.BAD_REQUEST).json({
+      code: ERROR_CODES.MISSING_FIELDS.code,
+      message: 'Please select a valid plan to continue.',
+    });
+  }
+
+  if (!email) {
+    return res.status(STATUS_CODES.BAD_REQUEST).json({
+      code: ERROR_CODES.MISSING_FIELDS.code,
+      message: 'Email is required.',
+    });
+  }
+
+  try {
+    // Use email to find user (since middleware verified it)
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(STATUS_CODES.UNAUTHORIZED).json({
+        code: ERROR_CODES.UNAUTHORIZED.code,
+        message: 'User not found.',
       });
     }
-  
-    try {
-      // Verify user exists and is active
-      const user = await User.findById(userId);
-      if (!user || !user.isActive) {
-        return res.status(STATUS_CODES.UNAUTHORIZED).json({
-          code: ERROR_CODES.UNAUTHORIZED.code,
-          message: 'User not found or not verified.',
-        });
-      }
-  
-      // Verify the plan exists
-      const plan = await Plan.findById(planId);
-      if (!plan) {
-        return res.status(STATUS_CODES.NOT_FOUND).json({
-          code: ERROR_CODES.PLAN_NOT_FOUND.code,
-          message: 'Selected plan does not exist.',
-        });
-      }
-  
-      // Update user's selected plan
-      user.selectedPlan = plan._id;
-      await user.save();
-  
-      return res.status(STATUS_CODES.OK).json({
-        message: 'Plan selected successfully. Proceed to payment.',
-        selectedPlan: {
-          id: plan._id,
-          name: plan.name,
-          description: plan.description,
-          prices: plan.prices,
-          benefits: plan.benefits,
-        },
-      });
-    } catch (error) {
-      console.error('Select Plan Error:', error);
-      return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
-        code: ERROR_CODES.INTERNAL_ERROR.code,
-        message: 'Could not select plan. Please try again.',
+
+    const plan = await Plan.findById(planId);
+    if (!plan) {
+      return res.status(STATUS_CODES.NOT_FOUND).json({
+        code: ERROR_CODES.PLAN_NOT_FOUND.code,
+        message: 'Selected plan does not exist.',
       });
     }
-  };
-  
+
+    user.selectedPlan = plan._id;
+    await user.save();
+
+    return res.status(STATUS_CODES.OK).json({
+      message: 'Plan selected successfully. Proceed to payment.',
+      selectedPlan: {
+        id: plan._id,
+        userId: user._id,
+        name: plan.name,
+        description: plan.description,
+        prices: plan.prices,
+        benefits: plan.benefits,
+      },
+    });
+  } catch (error) {
+    console.error('Select Plan Error:', error);
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+      code: ERROR_CODES.INTERNAL_ERROR.code,
+      message: 'Could not select plan. Please try again.',
+    });
+  }
+};
+
+
 
