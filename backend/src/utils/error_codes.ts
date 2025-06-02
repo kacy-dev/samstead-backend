@@ -7,6 +7,7 @@ export const ERROR_CODES = {
     ADMIN_EXISTS: { code: 1005, message: "Can't register as Admin, Multiple Admins is Prohibited" },
     ADMIN_NOT_FOUND: { code: 1006, message: "Admin not found or doesn't exist" },
     OTP_EXPIRED: { code: 1007, message: "OTP Expired!, Please request a new OTP" },
+    OTP_RESEND_TOO_EARLY: { code: 1025, message: "Please wait at least 1 minute before requesting a new OTP" },
     INVALID_OTP: { code: 1008, message: "Invalid OTP Provided" },
     INVALID_CREDENTIALS: { code: 1009, message: "Invalid Credentials provided" },
     ACCOUNT_LOCKED: { code: 1010, message: "Account is locked due to multiple failed login attempts" },

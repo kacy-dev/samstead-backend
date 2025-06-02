@@ -8,7 +8,7 @@ export class app_error extends Error {
         this.statusCode = statusCode;
         this.errorCode = errorCode;
         this.isOperational = isOperational;
-
+        
         Error.captureStackTrace(this, this.constructor);
     }
 }

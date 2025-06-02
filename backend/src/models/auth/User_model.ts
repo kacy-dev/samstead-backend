@@ -6,12 +6,11 @@ export interface IUser extends Document {
   email: string;
   phoneNumber: string;
   password: string;
-  deliveryAddress: {
-    street: string;
-    city: string;
-    postalCode: string;
-    country: string;
-  };
+  deliveryAddress: string;
+  selectedPlan?: mongoose.Types.ObjectId;
+  paystackRef?: string;
+  isPaid: boolean;
+    paymentVerifiedAt?: Date;
   cart: Array<{
     productId: mongoose.Types.ObjectId;
     quantity: number;
@@ -36,6 +35,7 @@ export interface IUser extends Document {
   loginAttempts: number;
   lockUntil: Date | null;
   otp?: string;
+  otpRequestedAt?: Date;
   otpExpiry?: Date;
   isActive: boolean;
 }
@@ -54,11 +54,12 @@ const UserSchema = new Schema<IUser>(
     phoneNumber: { type: String, required: true },
     password: { type: String, required: true, minlength: 8, select: false },
     deliveryAddress: {
-      street: { type: String },
-      city: { type: String },
-      postalCode: { type: String },
-      country: { type: String },
+        type: String, required: true
     },
+    selectedPlan: { type: Schema.Types.ObjectId, ref: 'Plan' },
+    paystackRef: { type: String },
+    isPaid: { type: Boolean, default: false },
+    paymentVerifiedAt: { type: Date },
     cart: [
       {
         productId: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
@@ -100,6 +101,7 @@ const UserSchema = new Schema<IUser>(
     lockUntil: { type: Date, select: false },
     otp: { type: String, select: false },
     otpExpiry: { type: Date, select: false },
+    otpRequestedAt: { type: Date, select: false },
     isActive: { type: Boolean, default: false },
   },
   { timestamps: true }
