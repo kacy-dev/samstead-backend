@@ -1,4 +1,3 @@
-// src/controllers/inventory/inventory_controller.ts
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import { Inventory } from '../../models/products/Inventory_model';
