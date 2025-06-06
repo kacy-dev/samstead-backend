@@ -65,7 +65,7 @@ router.post('/create-inventory', protectAdmin, createInventory);
  *         description: Number of items per page
  *     responses:
  *       200:
- *         description: List of grocery inventory items with pagination info
+ *         description: List of inventory items with pagination info
  *         content:
  *           application/json:
  *             schema:
@@ -164,7 +164,7 @@ router.put('/update-inventory/:id', protectAdmin, updateInventory);
  * @swagger
  * /api/delete-inventory/{id}:
  *   delete:
- *     summary: Delete a inventory item by ID
+ *     summary: Delete an inventory item by ID
  *     tags: [Inventory]
  *     security:
  *       - bearerAuth: []
@@ -190,7 +190,7 @@ router.delete('/delete-inventory/:id', protectAdmin, deleteInventory);
  * @swagger
  * /api/update-stock/{id}:
  *   patch:
- *     summary: Update stock quantity for a inventory item
+ *     summary: Update stock quantity for an inventory item
  *     tags: [Inventory]
  *     security:
  *       - bearerAuth: []
