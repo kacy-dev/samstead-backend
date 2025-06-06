@@ -162,15 +162,20 @@ export const getAllPlans = async (_req: Request, res: Response): Promise<void> =
 
 
 export const selectSubscriptionPlan = async (req: Request, res: Response) => {
-  const { planId, email } = req.body;
-
-  console.log(req.body);
+  const { planId, email, duration } = req.body;
 
   if (!planId) {
     return res.status(STATUS_CODES.BAD_REQUEST).json({
       code: ERROR_CODES.MISSING_FIELDS.code,
       message: 'Please select a valid plan to continue.',
     });
+  }
+
+  if(!['monthly', 'yearly'].includes(duration)) {
+    res.status(STATUS_CODES.BAD_REQUEST).json({
+      code: ERROR_CODES.MISSING_FIELDS.code,
+      message: "Invalid duration. Must be 'monthly or 'yearly'."
+    })
   }
 
   if (!email) {

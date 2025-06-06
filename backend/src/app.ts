@@ -1,12 +1,17 @@
 import express, { Application } from "express";
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
+import bodyParser from "body-parser";
 import { setupSwagger } from './docs/swagger_options';
 import { errorHandler } from './middlewares/error_handler';
 import admin_route from './routes/auth/admin_route';
 import plan_route from './routes/products/plan_route';
+import product_route from './routes/products/product_route';
+import category_route from './routes/products/category_route'
 import onboarding_plan_route from './routes/payment/onboarding_plan_route'
-import auth_route from './routes/auth/auth_route'
+import auth_route from './routes/auth/auth_route';
+import { verifyPaystackSignature } from './middlewares/verify_webHook';
+import { paystackWebhook } from './controllers/payment/onboarding_plan_payment';
 // const app = express();
 
 const app: Application = express();
@@ -21,29 +26,37 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 // Custom middleware to conditionally parse JSON
-app.use((req: Request, res: Response, next: NextFunction) => {
-  if (req.originalUrl === '/api/payment/webhook') {
-    // Skip JSON parsing for raw Paystack webhook
-    next();
-  } else {
-    express.json()(req, res, next); // Parse normally for others
-  }
-});
+// app.use((req: Request, res: Response, next: NextFunction) => {
+//   if (req.originalUrl === '/api/payment/webhook') {
+//     // Skip JSON parsing for raw Paystack webhook
+//     next();
+//   } else {
+//     express.json()(req, res, next); // Parse normally for others
+//   }
+// });
 
-// Raw body parsing only for webhook
-app.post(
-  '/api/payment/webhook',
-  express.raw({ type: 'application/json' }), // Capture raw body
-  (req: Request, res: Response, next: NextFunction) => {
-    // Attach parsed body so controller can still use req.parsedBody
-    (req as any).parsedBody = JSON.parse(req.body.toString('utf8'));
-    next();
-  }
+// // Raw body parsing only for webhook
+// app.post(
+//   '/api/payment/webhook',
+//   express.raw({ type: 'application/json' }), // Capture raw body
+//   (req: Request, res: Response, next: NextFunction) => {
+//     // Attach parsed body so controller can still use req.parsedBody
+//     (req as any).parsedBody = JSON.parse(req.body.toString('utf8'));
+//     next();
+//   }
+// );
+
+app.post('/api/payments/webhook',
+  bodyParser.raw({ type: 'application/json' }), // Attach raw body
+  verifyPaystackSignature,
+  paystackWebhook
 );
 
 app.use('/api/auth', admin_route);
 app.use('/api/auth', auth_route);
 app.use('/api', plan_route);
+app.use('/api', product_route);
+app.use('/api', category_route);
 app.use('/api/payment', onboarding_plan_route);
 
 setupSwagger(app);

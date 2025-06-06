@@ -8,6 +8,10 @@ export interface IUser extends Document {
   password: string;
   deliveryAddress: string;
   selectedPlan?: mongoose.Types.ObjectId;
+  planDuration?: 'monthly' | 'yearly';
+  planStartDate?: Date;
+  planEndDate?: Date;
+  isPlanActive?: boolean;
   paystackRef?: string;
   isPaid: boolean;
     paymentVerifiedAt?: Date;
@@ -57,6 +61,13 @@ const UserSchema = new Schema<IUser>(
         type: String, required: true
     },
     selectedPlan: { type: Schema.Types.ObjectId, ref: 'Plan' },
+    planDuration: {
+      type: String,
+      enum: ['monthly', 'yearly'],
+    },
+    planStartDate: { type: Date },
+    planEndDate: { type: Date },
+    isPlanActive: { type: Boolean, default: false },
     paystackRef: { type: String },
     isPaid: { type: Boolean, default: false },
     paymentVerifiedAt: { type: Date },
