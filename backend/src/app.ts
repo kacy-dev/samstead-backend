@@ -7,8 +7,9 @@ import { errorHandler } from './middlewares/error_handler';
 import admin_route from './routes/auth/admin_route';
 import plan_route from './routes/products/plan_route';
 import product_route from './routes/products/product_route';
-import category_route from './routes/products/category_route'
-import inventory_route from './routes/products/inventory_route'
+import category_route from './routes/products/category_route';
+import inventory_route from './routes/products/inventory_route';
+import order_route from './routes/products/order_route';
 import onboarding_plan_route from './routes/payment/onboarding_plan_route'
 import auth_route from './routes/auth/auth_route';
 import { verifyPaystackSignature } from './middlewares/verify_webHook';
@@ -38,6 +39,7 @@ app.use('/api', plan_route);
 app.use('/api', product_route);
 app.use('/api', category_route);
 app.use('/api', inventory_route);
+app.use('/api', order_route);
 app.use('/api/payment', onboarding_plan_route);
 
 setupSwagger(app);
