@@ -410,16 +410,22 @@ export const deleteProduct = async (
     const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json(errorCodes.VALIDATION_ERROR);
+      return res.status(STATUS_CODES.NOT_FOUND).json({
+        message: ERROR_CODES.PRODUCT_NOT_FOUND.message,
+        code: ERROR_CODES.PRODUCT_NOT_FOUND.code
+      });
     }
 
     const product = await Product.findById(id);
     if (!product) {
-      return res.status(404).json(errorCodes.PRODUCT_NOT_FOUND);
+      return res.status(STATUS_CODES.NOT_FOUND).json({
+        message: ERROR_CODES.PRODUCT_NOT_FOUND.message,
+        code: ERROR_CODES.PRODUCT_NOT_FOUND.code
+      });
     }
 
     if (product.image) {
-      // Extract publicId from image url, e.g. https://res.cloudinary.com/.../grocery_products/abc123.jpg
+
       const publicId = product.image.split('/').pop()?.split('.')[0];
       if (publicId) {
         await cloudinary.uploader.destroy(`grocery_products/${publicId}`);
