@@ -29,7 +29,11 @@ export const ERROR_CODES = {
   DUPLICATE_PRODUCT: { code: 409, message: 'Product already exists' },
   DUPLICATE_INVENTORY: { code: 409, message: 'Inventory already exists for this product' },
   CATEGORY_NOT_FOUND: { code: 404, message: 'Category not found' },
+  INVALID_PAYMENT_METHOD: { code: 1026, message: 'Invalid payment method' },
+  ORDER_NOT_FOUND: { code: 1027, message: 'Order not found' },
   PRODUCT_NOT_FOUND: { code: 404, message: 'Product not found' },
+  INVALID_SHIPPING_STATUS: { code: 1028, message: 'Invalid shipping status' },
+ORDER_CANNOT_BE_CANCELLED: { code: 1029, message: 'Order cannot be cancelled at this stage' },
 } as const;
 
 export const STATUS_CODES = {
