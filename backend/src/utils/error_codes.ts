@@ -27,6 +27,7 @@ export const ERROR_CODES = {
   KEYWORD_REQUIRED: { code: 400, message: 'Invalid request data, keyword is required' },
   DUPLICATE_CATEGORY: { code: 409, message: 'Category already exists' },
   DUPLICATE_PRODUCT: { code: 409, message: 'Product already exists' },
+  DUPLICATE_INVENTORY: { code: 409, message: 'Inventory already exists for this product' },
   CATEGORY_NOT_FOUND: { code: 404, message: 'Category not found' },
   PRODUCT_NOT_FOUND: { code: 404, message: 'Product not found' },
 } as const;
