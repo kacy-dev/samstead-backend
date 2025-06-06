@@ -15,7 +15,7 @@ export const verifyPaystackSignature = (req: Request, res: Response, next: NextF
   }
 
   try {
-    const rawBody = (req as any).rawBody; // Must be provided via middleware
+    const rawBody = (req as any).rawBody; 
     const computedHash = crypto.createHmac('sha512', secret).update(rawBody).digest('hex');
 
     if (computedHash !== signature) {

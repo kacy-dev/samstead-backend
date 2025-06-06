@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import cloudinary from '../../config/cloudinary_config';
-// import Category from '../../models/products/Category_model';
 import { Category } from '../../models/products/Category_model';
 import { Product } from '../../models/products/Product_model';
 import { ERROR_CODES, STATUS_CODES } from '../../utils/error_codes';

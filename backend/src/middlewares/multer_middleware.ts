@@ -1,4 +1,3 @@
-// src/middlewares/multerMiddleware.ts
 import { Request } from 'express';
 import multer, { FileFilterCallback } from 'multer';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
@@ -21,7 +20,7 @@ const fileFilter = (
 const storage = new CloudinaryStorage({
   cloudinary,
   params: async (_req, file) => {
-    const ext = file.mimetype.split('/')[1]; // e.g. "png"
+    const ext = file.mimetype.split('/')[1]; 
     return {
       folder: 'fashion',
       public_id: `${file.fieldname}-${Date.now()}`,

@@ -12,7 +12,7 @@ import onboarding_plan_route from './routes/payment/onboarding_plan_route'
 import auth_route from './routes/auth/auth_route';
 import { verifyPaystackSignature } from './middlewares/verify_webHook';
 import { paystackWebhook } from './controllers/payment/onboarding_plan_payment';
-// const app = express();
+
 
 const app: Application = express();
 app.use(cors());
@@ -25,29 +25,8 @@ app.get('/', (req: Request, res: Response) => {
   });
 });
 
-// Custom middleware to conditionally parse JSON
-// app.use((req: Request, res: Response, next: NextFunction) => {
-//   if (req.originalUrl === '/api/payment/webhook') {
-//     // Skip JSON parsing for raw Paystack webhook
-//     next();
-//   } else {
-//     express.json()(req, res, next); // Parse normally for others
-//   }
-// });
-
-// // Raw body parsing only for webhook
-// app.post(
-//   '/api/payment/webhook',
-//   express.raw({ type: 'application/json' }), // Capture raw body
-//   (req: Request, res: Response, next: NextFunction) => {
-//     // Attach parsed body so controller can still use req.parsedBody
-//     (req as any).parsedBody = JSON.parse(req.body.toString('utf8'));
-//     next();
-//   }
-// );
-
 app.post('/api/payments/webhook',
-  bodyParser.raw({ type: 'application/json' }), // Attach raw body
+  bodyParser.raw({ type: 'application/json' }), 
   verifyPaystackSignature,
   paystackWebhook
 );
