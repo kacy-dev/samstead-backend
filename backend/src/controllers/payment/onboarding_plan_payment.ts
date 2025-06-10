@@ -264,7 +264,7 @@ export const getAllPayments = async (req: Request, res: Response) => {
   try {
     const payments = await Payment.find()
       .populate('user', 'email firstName lastName')
-      .populate('plan', 'name prices')
+      .populate('plan', 'name ')
       .sort({ createdAt: -1 });
 
     return res.status(STATUS_CODES.OK).json(payments);
@@ -276,3 +276,5 @@ export const getAllPayments = async (req: Request, res: Response) => {
     });
   }
 };
+
+

@@ -12,6 +12,7 @@ import inventory_route from './routes/products/inventory_route';
 import order_route from './routes/products/order_route';
 import onboarding_plan_route from './routes/payment/onboarding_plan_route'
 import auth_route from './routes/auth/auth_route';
+import newUser_route from './routes/auth/newUser_route';
 import { verifyPaystackSignature } from './middlewares/verify_webHook';
 import { paystackWebhook } from './controllers/payment/onboarding_plan_payment';
 
@@ -35,6 +36,7 @@ app.post('/api/payments/webhook',
 
 app.use('/api/auth', admin_route);
 app.use('/api/auth', auth_route);
+app.use('/api/auth', newUser_route);
 app.use('/api', plan_route);
 app.use('/api', product_route);
 app.use('/api', category_route);

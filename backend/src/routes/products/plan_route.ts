@@ -12,7 +12,7 @@ import {
   getPlanById,
   updatePlan,
   deletePlan,
-  selectSubscriptionPlan
+  // selectSubscriptionPlan
 } from '../../controllers/products/plan_controller';
 import { protectAdmin } from '../../middlewares/auth_middleware';
 import { protectUser } from '../../middlewares/user_auth_middleware';
@@ -236,6 +236,6 @@ router.delete('/delete-plan/:planId', protectAdmin, deletePlan);
  *                   example: Could not select plan. Please try again.
  */
 
-router.post('/select-plan', ensureVerified, selectSubscriptionPlan)
+// router.post('/select-plan', ensureVerified, selectSubscriptionPlan)
 
 export default router;
