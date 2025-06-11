@@ -1,4 +1,4 @@
- 
+
 import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -145,9 +145,9 @@ export const initializePayment = async (req: AuthedRequest, res: Response) => {
       user.plan.paystackYearlyCode,
       user.plan.yearlyPrice
     );
-          // Save refs for later verification (optional – store latest)
+    // Save refs for later verification (optional – store latest)
     user.lastPayment = {
-      reference: "PENDING", // placeholder until webhook
+      reference: "PENDING",
       amount: 0,
       paidAt: new Date(),
     } as any;
@@ -167,142 +167,92 @@ export const initializePayment = async (req: AuthedRequest, res: Response) => {
   }
 };
 
-
-
-// export const paystackWebhook = async (req: Request, res: Response) => {
-//   const computed = crypto
-//     .createHmac("sha512", process.env.PAYSTACK_SECRET as string)
-//     .update(JSON.stringify(req.body))
-//     .digest("hex");
-
-//   if (computed !== req.headers["x-paystack-signature"])
-//     return res.status(STATUS_CODES.UNAUTHORIZED).json({
-//       ...ERROR_CODES.UNAUTHORIZED_ACCESS,
-//       success: false,
-//     });
-
-//   const evt = req.body;
-//   if (evt.event !== "charge.success" || evt.data.status !== "success")
-//     return res.sendStatus(200);
-
-//   const user = await User.findById(evt.data.metadata.userId).populate<{ plan: IPlan }>(
-//     "plan"
-//   );
-//   if (!user) return res.sendStatus(200);
-
-//   const amt = evt.data.amount;
-//   let cycle: "monthly" | "yearly" | null = null;
-//   if (amt === user.plan.monthlyPrice) cycle = "monthly";
-//   else if (amt === user.plan.yearlyPrice) cycle = "yearly";
-
-//   if (!cycle) return res.sendStatus(200);
-
-//   const start = new Date();
-//   const expires = cycle === "monthly"
-//     ? new Date(start.setMonth(start.getMonth() + 1))
-//     : new Date(start.setFullYear(start.getFullYear() + 1));
-
-//   user.status = "ACTIVE";
-//   user.planCycle = cycle;
-//   user.planExpiresAt = expires;
-//   user.lastPayment = {
-//     reference: evt.data.reference,
-//     amount: amt,
-//     paidAt: new Date(evt.data.paid_at),
-//   } as any;
-
-//   await user.save();
-
-//   await PaymentLog.create({
-//       user: user._id,
-//       plan: user.plan._id,
-//       amount: amt,
-//       cycle: cycle,
-//       reference: evt.data.reference,
-//       paidAt: new Date(evt.data.paid_at || evt.data.created_at)
-//     });
-
-//   res.sendStatus(200);
-// };
-
-
+/* ________________ WebHook verification controller for all payments and authomatic update of the DB only on successful verifcation ____________ */
 export const paystackWebhook = async (req: Request, res: Response) => {
-  const computed = crypto
-      .createHmac("sha512", process.env.PAYSTACK_SECRET as string)
-      .update(JSON.stringify(req.body))
-      .digest("hex");
 
-  if (computed !== req.headers["x-paystack-signature"])
-      return res.status(STATUS_CODES.UNAUTHORIZED).json({
-          ...ERROR_CODES.UNAUTHORIZED_ACCESS,
-          success: false,
-      });
+  const rawBody = JSON.stringify(req.body);
+  const signature = req.headers["x-paystack-signature"] as string;
+  const computed = crypto
+    .createHmac("sha512", process.env.PAYSTACK_SECRET as string)
+    .update(rawBody)
+    .digest("hex");
+
+  if (computed !== signature) {
+    return res.status(STATUS_CODES.UNAUTHORIZED).json({
+      ...ERROR_CODES.UNAUTHORIZED_ACCESS,
+      success: false,
+    });
+  }
 
   const evt = req.body;
-  if (evt.event !== "charge.success" || evt.data.status !== "success")
-      return res.sendStatus(200);
+  if (evt.event !== "charge.success" || evt.data.status !== "success") {
+    return res.sendStatus(200);
+  }
 
   try {
-      const verificationUrl = `https://api.paystack.co/transaction/verify/${evt.data.reference}`;
-      const { data: verificationResponse } = await axios.get(
-          verificationUrl,
-          {
-              headers: {
-                  Authorization: `Bearer ${process.env.PAYSTACK_SECRET}`
-              }
-          }
-      );
 
-      if (verificationResponse.data.status !== 'success') {
-          console.error(`Paystack verification failed for reference ${evt.data.reference}.  Paystack status: ${verificationResponse.data.status}`);
-          return res.sendStatus(200); 
-      }
+    const verificationUrl = `https://api.paystack.co/transaction/verify/${evt.data.reference}`;
 
+    const { data: verificationResponse } = await axios.get(verificationUrl, {
+      headers: { Authorization: `Bearer ${process.env.PAYSTACK_SECRET}` },
+    });
 
-      const user = await User.findById(evt.data.metadata.userId).populate<{ plan: IPlan }>(
-          "plan"
-      );
-      if (!user) return res.sendStatus(200);
+    if (verificationResponse.data.status !== "success") {
+      return res.sendStatus(200);
+    }
 
-      const amt = evt.data.amount;
-      let cycle: "monthly" | "yearly" | null = null;
-      if (amt === user.plan.monthlyPrice) cycle = "monthly";
-      else if (amt === user.plan.yearlyPrice) cycle = "yearly";
+    /* ---------- Find user & plan ---------- */
+    const userId = evt.data.metadata?.userId;
+    const user = await User.findById(userId).populate<{ plan: IPlan }>("plan");
+    if (!user) {
+      return res.sendStatus(200);
+    }
 
-      if (!cycle) return res.sendStatus(200);
+    /* ---------- Amount matching (convert DB naira → kobo) ---------- */
+    const amtKobo = evt.data.amount;                  // Paystack gives kobo
+    const monthlyKobo = user.plan.monthlyPrice * 100;     // DB stored in naira
+    const yearlyKobo = user.plan.yearlyPrice * 100;     // convert to kobo
 
-      const start = new Date();
-      const expires = cycle === "monthly"
-          ? new Date(start.setMonth(start.getMonth() + 1))
-          : new Date(start.setFullYear(start.getFullYear() + 1));
+    let cycle: "monthly" | "yearly" | null = null;
+    if (amtKobo === monthlyKobo) cycle = "monthly";
+    else if (amtKobo === yearlyKobo) cycle = "yearly";
+    else {
+      return res.sendStatus(200);
+    }
 
-      user.status = "ACTIVE";
-      user.planCycle = cycle;
-      user.planExpiresAt = expires;
-      user.lastPayment = {
-          reference: evt.data.reference,
-          amount: amt,
-          paidAt: new Date(evt.data.paid_at),
-      } as any;
+    /* ---------- Update user subscription ---------- */
+    const now = new Date();
+    const expires =
+      cycle === "monthly"
+        ? new Date(now.setMonth(now.getMonth() + 1))
+        : new Date(now.setFullYear(now.getFullYear() + 1));
 
-      await user.save();
+    user.status = "ACTIVE";
+    user.planCycle = cycle;
+    user.planExpiresAt = expires;
+    user.lastPayment = {
+      reference: evt.data.reference,
+      amount: amtKobo,             
+      paidAt: new Date(evt.data.paid_at),
+    } as any;
+    await user.save();
 
-      await PaymentLog.create({
-          user: user._id,
-          plan: user.plan._id,
-          amount: amt,
-          cycle: cycle,
-          reference: evt.data.reference,
-          paidAt: new Date(evt.data.paid_at || evt.data.created_at)
-      });
+    await PaymentLog.create({
+      user: user._id,
+      plan: user.plan._id,
+      amount: amtKobo,
+      cycle,
+      reference: evt.data.reference,
+      paidAt: new Date(evt.data.paid_at || evt.data.created_at),
+    });
 
-      res.sendStatus(200);
-
-  } catch (error: any) {
-      console.error("Error verifying payment or processing webhook:", error.response?.data || error);
-      return res.sendStatus(500); // Or handle the error appropriately
+    res.sendStatus(200);
+  } catch (err: any) {
+    console.error("🔥 Webhook error:", err.response?.data || err);
+    res.sendStatus(500);
   }
 };
+
 
 export const loginUser = async (req: Request, res: Response) => {
   try {

@@ -61,7 +61,7 @@ const router = express.Router();
  *       409:
  *         description: User already exists
  */
-router.post('/user/register', registerUser);
+router.post('/register', registerUser);
 
 /**
  * @swagger
@@ -87,7 +87,7 @@ router.post('/user/register', registerUser);
  *       400:
  *         description: Invalid credentials
  */
-router.post('/auth/login', loginUser);
+router.post('/login', loginUser);
 
 
 /**
@@ -151,34 +151,5 @@ router.post('/payment/initialize', authGuard, initializePayment);
  */
 router.post('/payment/webhook', paystackWebhook);
 
-/**
- * @swagger
- * /api/admin/plans:
- *   post:
- *     summary: Admin creates a new plan
- *     tags: [Plans]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [name, monthlyPrice, yearlyPrice, monthlyPriceCode, yearlyPriceCode]
- *             properties:
- *               name: { type: string }
- *               description: { type: string }
- *               monthlyPrice: { type: number }
- *               yearlyPrice: { type: number }
- *               monthlyPriceCode: { type: string }
- *               yearlyPriceCode: { type: string }
- *               benefits: { type: array, items: { type: string } }
- *     responses:
- *       201:
- *         description: Plan created
- *       401:
- *         description: Unauthorized (not admin)
- */
 
 export default router;

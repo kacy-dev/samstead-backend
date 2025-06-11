@@ -1,4 +1,4 @@
-import { Response, NextFunction } from 'express';
+import { Response, NextFunction, AuthedRequest } from 'express';
 import { ERROR_CODES, STATUS_CODES } from "../utils/error_codes";
 import jwt from 'jsonwebtoken';
 

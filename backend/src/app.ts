@@ -13,8 +13,7 @@ import order_route from './routes/products/order_route';
 import onboarding_plan_route from './routes/payment/onboarding_plan_route'
 import auth_route from './routes/auth/auth_route';
 import newUser_route from './routes/auth/newUser_route';
-import { verifyPaystackSignature } from './middlewares/verify_webHook';
-import { paystackWebhook } from './controllers/payment/onboarding_plan_payment';
+import { paystackWebhook } from './controllers/auth/newUser_authController';
 
 
 const app: Application = express();
@@ -30,7 +29,6 @@ app.get('/', (req: Request, res: Response) => {
 
 app.post('/api/payments/webhook',
   bodyParser.raw({ type: 'application/json' }), 
-  verifyPaystackSignature,
   paystackWebhook
 );
 
