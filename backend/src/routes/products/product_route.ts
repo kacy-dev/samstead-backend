@@ -54,7 +54,7 @@ const router = express.Router();
  *       401:
  *         description: Unauthorized
  */
-router.post('/add-products', protectAdmin, upload.single('image'), addProduct);
+router.post('/add-products', protectAdmin, upload.array('images', 5), addProduct);
 
 /**
  * @swagger
@@ -208,7 +208,7 @@ router.get('/products/:id', getProductById);
  *       401:
  *         description: Unauthorized
  */
-router.put('/products/:id', protectAdmin, upload.single('image'), updateProduct);
+router.put('/products/:id', protectAdmin, upload.array('images', 5), updateProduct);
 
 /**
  * @swagger

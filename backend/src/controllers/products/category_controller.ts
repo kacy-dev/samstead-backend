@@ -70,6 +70,23 @@ export const createCategory = async (
     }
 };
 
+export const getAllCategories = async (req: Request, res: Response) => {
+    try {
+      const categories = await Category.find().sort({ createdAt: -1 });
+  
+      return res.status(STATUS_CODES.OK).json({
+        message: 'Categories fetched successfully',
+        categories,
+      });
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+        message: ERROR_CODES.INTERNAL_ERROR.message,
+        code: ERROR_CODES.INTERNAL_ERROR.code,
+      });
+    }
+  };
+
 export const updateCategory = async (
     req: Request<{ id: string }, {}, UpdateCategoryBody>,
     res: Response
@@ -113,42 +130,6 @@ export const updateCategory = async (
 
 };
 
-export const getAllCategories = async (
-    req: Request<{}, {}, {}, ListCategoriesQuery>,
-    res: Response
-) => {
-    try {
-        const { page = '1', limit = '20', active } = req.query;
-
-        const pageNum = Math.max(+page, 1);
-        const limitNum = Math.min(Math.max(+limit, 1), 100);
-
-        const filter: Record<string, any> = {};
-        if (active !== undefined) filter.isActive = active === 'true';
-
-        const totalItems = await Category.countDocuments(filter);
-        const categories = await Category.find(filter)
-            .sort('name')
-            .skip((pageNum - 1) * limitNum)
-            .limit(limitNum);
-
-        return res.status(200).json({
-            success: true,
-            data: categories,
-            pagination: {
-                currentPage: pageNum,
-                totalPages: Math.ceil(totalItems / limitNum),
-                totalItems,
-            },
-        });
-    } catch (error) {
-        console.error('Get Categories Error:', error);
-        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
-            messsage: ERROR_CODES.INTERNAL_ERROR.message,
-            code: ERROR_CODES.INTERNAL_ERROR.code
-        });
-    }
-};
 
 export const getCategoryById = async (
     req: Request<{ id: string }>,
