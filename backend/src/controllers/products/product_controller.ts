@@ -473,7 +473,7 @@ export const updateProduct = async (
     if (discountPrice !== undefined) product.discountPrice = Number(discountPrice);
     if (stock !== undefined) product.stock = Number(stock);
     if (isAvailable !== undefined) product.isAvailable = isAvailable === 'true' || isAvailable === true;
-    if (status !== undefined) product.status = status as 'active' | 'draft' | 'hidden';
+    if (status !== undefined) product.status = status as 'active' | 'draft' | 'hidden' | 'low-stock' | 'out-of-stock';
     if (brand !== undefined) product.brand = brand.trim();
     if (weight !== undefined) product.weight = parseFloat(String(weight));
 

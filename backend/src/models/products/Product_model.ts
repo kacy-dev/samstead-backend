@@ -20,7 +20,7 @@ export interface IProduct extends Document {
   reviewsCount: number;
   brand?: string;
   weight?: number;
-  status: 'active' | 'draft' | 'hidden';
+  status: 'active' | 'draft' | 'hidden' | 'low-stock' | 'out-of-stock';
   createdAt: Date;
   updatedAt: Date;
 }
@@ -50,7 +50,7 @@ const Product_model = new Schema<IProduct>(
     weight: { type: Number },
     status: {
       type: String,
-      enum: ['active', 'draft', 'hidden'],
+      enum: ['active', 'draft', 'hidden', 'low-stock', 'out-of-stock'],
       default: 'active',
     },
   },
