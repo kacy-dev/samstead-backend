@@ -32,6 +32,7 @@ export const protectAdmin = async (
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as DecodedToken;
 
     const admin = await Admin.findById(decoded.adminId).select('-password');
+    console.log("Decoded Admin", decoded.admin);
 
     if (!admin) {
       return res.status(STATUS_CODES.NOT_FOUND).json({ 
@@ -48,6 +49,7 @@ export const protectAdmin = async (
     }
 
     req.admin = admin;
+    console.log("Admin token", admin)
     next();
   } catch (error) {
     console.error(error);

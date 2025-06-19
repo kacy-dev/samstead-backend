@@ -77,6 +77,9 @@ const uploadToCloudinary = async (filePath: string) =>
         weight,
       } = req.body;
       console.log(req.body);
+
+      console.log("BODY:", req.body);
+
   
       if (!name || !sku || !description || !price || !stock || !categoryId || !brand || !weight) {
         return res.status(STATUS_CODES.BAD_REQUEST).json({
@@ -125,6 +128,7 @@ const uploadToCloudinary = async (filePath: string) =>
       const imageUrls = imageUploadResults.map((upload) => upload.secure_url);
   
       // }
+      console.log("FILES:", req.files);
       console.log("Uploaded files:", req.files);
       // Parse nutrition
       let parsedNutrition: NutritionItem[] = [];
