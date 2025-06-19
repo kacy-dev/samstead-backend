@@ -6,11 +6,32 @@ import { generateOtp } from '../../utils/otp_generator';
 import { sendAdminRegistrationEmail } from '../../config/mailer_config';
 import { ERROR_CODES, STATUS_CODES } from '../../utils/error_codes';
 
-const generateJWT = (adminId: string, role: string): string => {
-  return jwt.sign({ adminId, role }, process.env.JWT_SECRET as string, {
-    expiresIn: '1d',
-  });
+// const generateJWT = (adminId: string, role: string): string => {
+//   return jwt.sign({ adminId, role }, process.env.JWT_SECRET as string, {
+//     expiresIn: '1d',
+//   });
+// };
+
+const generateJWT = (
+  adminId: string,
+  role: string,
+  name: string,
+  email: string,
+  image?: string
+): string => {
+  return jwt.sign(
+    {
+      adminId,
+      role,
+      name,
+      email,
+      image,
+    },
+    process.env.JWT_SECRET as string,
+    { expiresIn: '1d' }
+  );
 };
+
 
 const isAccountLocked = (admin: IAdmin): boolean => {
   return !!(admin.lockUntil && admin.lockUntil > Date.now());
@@ -164,7 +185,13 @@ export const loginAdmin = async (
     admin.lockUntil = undefined;
     await admin.save();
 
-    const token = generateJWT(admin._id.toString(), admin.role);
+    const token = generateJWT(
+    admin._id.toString(),
+     admin.role,
+     admin.name,
+     admin.email,
+     admin.image
+     );
 
     res.status(STATUS_CODES.OK).json({
       message: 'Login successful',

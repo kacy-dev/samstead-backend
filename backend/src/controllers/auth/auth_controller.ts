@@ -19,7 +19,7 @@ const generateOtp = (): string => {
   return Math.floor(1000 + Math.random() * 9000).toString();
 };
 
-// Check if account is currently locked
+
 const isAccountLocked = (user: IUser): boolean => {
   return !!(user.lockUntil && user.lockUntil > new Date());
 };

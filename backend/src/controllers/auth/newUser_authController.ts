@@ -248,7 +248,7 @@ export const paystackWebhook = async (req: Request, res: Response) => {
 
     res.sendStatus(200);
   } catch (err: any) {
-    console.error("🔥 Webhook error:", err.response?.data || err);
+    console.error(" Webhook error:", err.response?.data || err);
     res.sendStatus(500);
   }
 };
