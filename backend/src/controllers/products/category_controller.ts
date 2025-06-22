@@ -7,11 +7,13 @@ import { ERROR_CODES, STATUS_CODES } from '../../utils/error_codes';
 interface CreateCategoryBody {
     name: string;
     description?: string;
+    status?: 'active' | 'deactivated';
     isActive?: boolean;
 }
 interface UpdateCategoryBody {
     name?: string;
     description?: string;
+    status?: 'active' | 'deactivated';
     isActive?: boolean;
 }
 interface ListCategoriesQuery {
@@ -25,7 +27,7 @@ export const createCategory = async (
     res: Response
 ) => {
     try {
-        const { name, description, isActive } = req.body;
+        const { name, description, status, isActive } = req.body;
 
         if (!name) {
             return res.status(STATUS_CODES.BAD_REQUEST).json({
@@ -56,6 +58,7 @@ export const createCategory = async (
             name,
             description,
             image: imageUrl,
+            status: status || 'active',
             isActive: isActive || true,
         });
 
@@ -93,7 +96,7 @@ export const updateCategory = async (
 ) => {
     try {
         const { id } = req.params;
-        const { name, description, isActive } = req.body;
+        const { name, description, status, isActive } = req.body;
 
         const category = await Category.findById(id);
         if (!category) {
@@ -116,6 +119,7 @@ export const updateCategory = async (
         if (name !== undefined) category.name = name;
         if (description !== undefined) category.description = description;
         if (imageUrl !== undefined) category.image = imageUrl;
+        if (status !== undefined) product.status = status as 'active' | 'deactivatd';
         if (typeof isActive === 'boolean') category.isActive = isActive;
 
         const updated = await category.save();

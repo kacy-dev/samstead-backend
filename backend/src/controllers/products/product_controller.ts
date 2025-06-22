@@ -280,7 +280,7 @@ export const getRelatedProducts = async (
       category: currentProduct.category,
     })
       .limit(5)
-      .select('-nutrition'); // exclude nutrition field to reduce payload
+      .select('-nutrition');
 
     return res.status(200).json({ success: true, data: relatedProducts });
   } catch (error) {

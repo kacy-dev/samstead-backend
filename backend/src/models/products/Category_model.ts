@@ -4,6 +4,7 @@ export interface ICategory extends Document {
   name: string;
   description?: string;
   image?: string;
+  status: 'active' | 'inactive' ;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -30,6 +31,11 @@ const Category_model: Schema = new Schema<ICategory>(
           /^https?:\/\/[a-zA-Z0-9.-]+(?:\/[a-zA-Z0-9&%=~_.-]*)*/.test(v),
         message: 'Invalid image URL',
       },
+    },
+    status: {
+      type: String,
+      enum: ['active', 'inactive'],
+      default: 'active',
     },
     isActive: {
       type: Boolean,
