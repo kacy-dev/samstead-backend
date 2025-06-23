@@ -7,13 +7,13 @@ import { ERROR_CODES, STATUS_CODES } from '../../utils/error_codes';
 interface CreateCategoryBody {
     name: string;
     description?: string;
-    status?: 'active' | 'deactivated';
+    status?: 'active' | 'inactive' | 'draft';
     isActive?: boolean;
 }
 interface UpdateCategoryBody {
     name?: string;
     description?: string;
-    status?: 'active' | 'deactivated';
+    status?: 'active' | 'inactive' | 'draft';
     isActive?: boolean;
 }
 interface ListCategoriesQuery {
@@ -119,7 +119,7 @@ export const updateCategory = async (
         if (name !== undefined) category.name = name;
         if (description !== undefined) category.description = description;
         if (imageUrl !== undefined) category.image = imageUrl;
-        if (status !== undefined) product.status = status as 'active' | 'deactivatd';
+        if (status !== undefined) category.status = status as 'active' | 'inactive' | 'draft';
         if (typeof isActive === 'boolean') category.isActive = isActive;
 
         const updated = await category.save();

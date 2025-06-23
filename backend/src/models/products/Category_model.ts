@@ -4,7 +4,7 @@ export interface ICategory extends Document {
   name: string;
   description?: string;
   image?: string;
-  status: 'active' | 'inactive' ;
+  status: 'active' | 'inactive' | 'draft';
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -22,7 +22,7 @@ const Category_model: Schema = new Schema<ICategory>(
     description: {
       type: String,
       trim: true,
-      maxlength: [300, 'Description must be less than 300 characters'],
+      maxlength: [40, 'Description must be less than 40 characters'],
     },
     image: {
       type: String,
@@ -34,7 +34,7 @@ const Category_model: Schema = new Schema<ICategory>(
     },
     status: {
       type: String,
-      enum: ['active', 'inactive'],
+      enum: ['active', 'inactive', 'draft'],
       default: 'active',
     },
     isActive: {

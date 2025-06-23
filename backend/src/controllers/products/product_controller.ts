@@ -52,7 +52,7 @@ const uploadToCloudinary = async (filePath: string) =>
     nutrition?: string | NutritionItem[];
     images?: string[];
     isAvailable?: boolean;
-    status?: 'active' | 'draft' | 'hidden';
+    status?: 'active' | 'draft' | 'hidden' | 'low-stock' | 'out-of-stock';
     brand?: string;
     weight?: number;
   }
