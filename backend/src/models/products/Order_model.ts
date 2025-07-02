@@ -2,7 +2,8 @@ import mongoose, { Schema, Document, Types } from 'mongoose';
 
 export enum ShippingStatus {
     Pending = 'Pending',
-    Shipped = 'Shipped',
+    Processing = 'Processing',
+    OutForDelivery = 'Out for Delivery',
     Delivered = 'Delivered',
     Cancelled = 'Cancelled',
 }
@@ -15,36 +16,30 @@ export enum PaymentStatus {
 
 export enum PaymentMethod {
     Card = 'Card',
-    PayPal = 'PayPal',
-    BankTransfer = 'BankTransfer',
+    Cash = 'Cash',
 }
+
 export interface OrderItem {
-    product: Types.ObjectId;  // ref Inventory
+    product: Types.ObjectId;  
     quantity: number;
     price: number;
 }
 
-export interface ShippingAddress {
-    street: string;
-    city: string;
-    state: string;
-    country: string;
-    zip: string;
-}
-
 export interface IOrder extends Document {
-    user: Types.ObjectId;             // ref User
+    orderCode: string;
+    user: Types.ObjectId;
     items: OrderItem[];
-    orderTotal: number;
-    shippingAddress: ShippingAddress;
+    orderTotal: number;     
+    totalPayable: number;   
+    deliveryFee: number;
+    premiumDiscount: number;
+    email: string;
+    nameOnCard?: string;
+    shippingAddress?: string;
     shippingStatus: ShippingStatus;
     paymentStatus: PaymentStatus;
     paymentMethod: PaymentMethod;
     orderDate: Date;
-    deliveryDate?: Date | null;
-    trackingNumber?: string | null;
-    customerNotes?: string;
-    discountApplied: number;
     updateOrderStatus: (status: ShippingStatus) => Promise<IOrder>;
     updatePaymentStatus: (status: PaymentStatus) => Promise<IOrder>;
 }
@@ -58,23 +53,18 @@ const OrderItemSchema = new Schema<OrderItem>(
     { _id: false }
 );
 
-const ShippingAddressSchema = new Schema<ShippingAddress>(
-    {
-        street: { type: String, required: true },
-        city: { type: String, required: true },
-        state: { type: String, required: true },
-        country: { type: String, required: true },
-        zip: { type: String, required: true },
-    },
-    { _id: false }
-);
-
 const OrderSchema = new Schema<IOrder>(
     {
+        orderCode: { type: String, required: true, unique: true },
         user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
         items: { type: [OrderItemSchema], required: true },
-        orderTotal: { type: Number, required: true, min: 0 },
-        shippingAddress: { type: ShippingAddressSchema, required: true },
+        orderTotal: { type: Number, required: true },
+        totalPayable: { type: Number, required: true },
+        deliveryFee: { type: Number, required: true },
+        premiumDiscount: { type: Number, default: 0 },
+        email: { type: String, required: true },
+        nameOnCard: { type: String },
+        shippingAddress: { type: String, required: false },
         shippingStatus: {
             type: String,
             enum: Object.values(ShippingStatus),
@@ -91,13 +81,10 @@ const OrderSchema = new Schema<IOrder>(
             required: true,
         },
         orderDate: { type: Date, default: Date.now },
-        deliveryDate: { type: Date, default: null },
-        trackingNumber: { type: String, default: null },
-        customerNotes: { type: String, trim: true },
-        discountApplied: { type: Number, default: 0 },
     },
     { timestamps: true }
 );
+
 OrderSchema.methods.updateOrderStatus = function (
     this: IOrder,
     status: ShippingStatus

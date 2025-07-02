@@ -1,13 +1,13 @@
 import express from 'express';
 
-const {
+import {
     createInventory,
     getAllInventory,
     getInventoryById,
     updateInventory,
     deleteInventory,
     updateStock,
-} = require('../../controllers/products/inventory_controller');
+} from '../../controllers/products/inventory_controller';
 const { protectAdmin } = require('../../middlewares/auth_middleware');
 
 const router = express.Router();
@@ -229,4 +229,4 @@ router.delete('/delete-inventory/:id', protectAdmin, deleteInventory);
  */
 router.patch('/update-stock/:id', protectAdmin, updateStock);
 
-module.exports = router;
+export default router;
