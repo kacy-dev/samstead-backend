@@ -194,7 +194,7 @@ export const getOrderById = async (req: Request, res: Response) => {
       const order = await Order.findOne(
         isObjectId ? { _id: identifier } : { orderCode: identifier }
       )
-        .populate('user', 'name email')
+        .populate('user', 'name email plan')
         .populate('items.product', 'name price')
         .lean();
   
