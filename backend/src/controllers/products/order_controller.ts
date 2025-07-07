@@ -148,39 +148,47 @@ export const createOrder = async (req: Request<{}, {}, CreateOrderBody>, res: Re
 };
   
 
-  export const getAllOrders = async (_req: Request, res: Response) => {
-    try {
-      const orders = await Order.find()
-        .populate('user', 'name email')
-        .populate('items.product', 'name price')
-        .sort({ createdAt: -1 });
-  
-      return res.status(STATUS_CODES.OK).json({
-        message: 'Orders retrieved successfully',
-        count: orders.length,
-        data: orders.map(order => ({
-          _id: order._id,
-          orderCode: order.orderCode,
-          user: order.user,
-          items: order.items,
-          orderTotal: order.orderTotal,
-          totalPayable: order.totalPayable,
-          deliveryFee: order.deliveryFee,
-          premiumDiscount: order.premiumDiscount,
-          email: order.email,
-          paymentStatus: order.paymentStatus,
-          paymentMethod: order.paymentMethod,
-          shippingStatus: order.shippingStatus,
-          createdAt: order.createdAt,
-        })),
-      });
-    } catch (error) {
-      console.error('Failed to fetch orders:', error);
-      return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
-        ...ERROR_CODES.INTERNAL_ERROR,
-      });
-    }
-  };
+export const getAllOrders = async (_req: Request, res: Response) => {
+  try {
+    const orders = await Order.find()
+      .populate({
+        path: 'user',
+        select: 'firstName lastName email plan planCycle status',
+        populate: {
+          path: 'plan',
+          select: 'name price',
+        },
+      })
+      .populate('items.product', 'name price')
+      .sort({ createdAt: -1 });
+
+    return res.status(STATUS_CODES.OK).json({
+      message: 'Orders retrieved successfully',
+      count: orders.length,
+      data: orders.map(order => ({
+        _id: order._id,
+        orderCode: order.orderCode,
+        user: order.user,
+        items: order.items,
+        orderTotal: order.orderTotal,
+        totalPayable: order.totalPayable,
+        deliveryFee: order.deliveryFee,
+        premiumDiscount: order.premiumDiscount,
+        email: order.email,
+        paymentStatus: order.paymentStatus,
+        paymentMethod: order.paymentMethod,
+        shippingStatus: order.shippingStatus,
+        createdAt: order.createdAt,
+      })),
+    });
+  } catch (error) {
+    console.error('Failed to fetch orders:', error);
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+      ...ERROR_CODES.INTERNAL_ERROR,
+    });
+  }
+};
+
 
 
 export const getOrderById = async (req: Request, res: Response) => {
