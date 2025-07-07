@@ -3,7 +3,7 @@ import {
   registerAdmin,
   verifyOTP,
   loginAdmin,
-  getAdminDashboard.
+  getAdminDashboard,
   getAllUsers
 } from '../../controllers/auth/admin_controller';
 import { protectAdmin } from '../../middlewares/auth_middleware';
