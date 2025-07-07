@@ -118,6 +118,21 @@ router.post('/admin/login', loginAdmin);
  *       401:
  *         description: Unauthorized
  */
+router.get('/admin/users', protectAdmin, getAdminDashboard);
+/**
+ * @swagger
+ * /api/auth/admin/dashboard:
+ *   get:
+ *     summary: Get admin dashboard (Protected)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Admin dashboard data retrieved
+ *       401:
+ *         description: Unauthorized
+ */
 router.get('/admin/dashboard', protectAdmin, getAdminDashboard);
 
 export default router;

@@ -212,7 +212,7 @@ export const loginAdmin = async (
 export const getAllUsers = async (_req: Request, res: Response) => {
   try {
     const users = await User.find()
-      .populate('plan', 'name price features') // Adjust if you have different fields
+      .populate('plan', 'name price features') 
       .sort({ createdAt: -1 });
 
     const formattedUsers = users.map((user) => ({
