@@ -3,7 +3,8 @@ import {
   registerAdmin,
   verifyOTP,
   loginAdmin,
-  getAdminDashboard
+  getAdminDashboard.
+  getAllUsers
 } from '../../controllers/auth/admin_controller';
 import { protectAdmin } from '../../middlewares/auth_middleware';
 
@@ -118,7 +119,7 @@ router.post('/admin/login', loginAdmin);
  *       401:
  *         description: Unauthorized
  */
-router.get('/admin/users', protectAdmin, getAdminDashboard);
+router.get('/admin/users', protectAdmin, getAllUsers);
 /**
  * @swagger
  * /api/auth/admin/dashboard:
