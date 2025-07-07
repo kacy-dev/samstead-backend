@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import Admin, { IAdmin } from '../../models/auth/Admin_model';
+import User, { IUser } from "../../models/auth/User_model";
 import { generateOtp } from '../../utils/otp_generator';
 import { sendAdminRegistrationEmail } from '../../config/mailer_config';
 import { ERROR_CODES, STATUS_CODES } from '../../utils/error_codes';
@@ -204,6 +205,40 @@ export const loginAdmin = async (
       message: ERROR_CODES.LOGIN_FAILED.message,
       code: ERROR_CODES.LOGIN_FAILED.code,
       success: false,
+    });
+  }
+};
+
+export const getAllUsers = async (_req: Request, res: Response) => {
+  try {
+    const users = await User.find()
+      .populate('plan', 'name price features') // Adjust if you have different fields
+      .sort({ createdAt: -1 });
+
+    const formattedUsers = users.map((user) => ({
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      deliveryAddress: user.deliveryAddress,
+      status: user.status,
+      plan: user.plan,
+      planCycle: user.planCycle,
+      planExpiresAt: user.planExpiresAt,
+      lastPayment: user.lastPayment,
+      createdAt: user.createdAt,
+    }));
+
+    return res.status(STATUS_CODES.OK || 200).json({
+      message: 'Users retrieved successfully',
+      count: formattedUsers.length,
+      data: formattedUsers,
+    });
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR || 500).json({
+      ...ERROR_CODES.INTERNAL_ERROR || { message: 'Something went wrong' },
     });
   }
 };
