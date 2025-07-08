@@ -243,6 +243,34 @@ export const getAllUsers = async (_req: Request, res: Response) => {
   }
 };
 
+export const deleteUserById = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const user = await User.findByIdAndDelete(id);
+
+    if (!user) {
+      return res.status(STATUS_CODES.NOT_FOUND || 404).json({
+        ...ERROR_CODES.USER_NOT_FOUND || { message: 'User not found' },
+      });
+    }
+
+    return res.status(STATUS_CODES.OK || 200).json({
+      message: 'User deleted successfully',
+      data: {
+        id: user._id,
+        name: `${user.firstName} ${user.lastName}`,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    console.error('Delete User Error:', error);
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR || 500).json({
+      ...ERROR_CODES.INTERNAL_ERROR || { message: 'Something went wrong' },
+    });
+  }
+};
+
 export const getAdminDashboard = async (
     req: Request, 
     res: Response

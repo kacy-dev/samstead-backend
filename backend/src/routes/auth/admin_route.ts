@@ -4,7 +4,8 @@ import {
   verifyOTP,
   loginAdmin,
   getAdminDashboard,
-  getAllUsers
+  getAllUsers,
+  deleteUserById
 } from '../../controllers/auth/admin_controller';
 import { protectAdmin } from '../../middlewares/auth_middleware';
 
@@ -120,6 +121,7 @@ router.post('/admin/login', loginAdmin);
  *         description: Unauthorized
  */
 router.get('/admin/users', getAllUsers);
+router.delete('/admin/users/:id', protectAdmin, deleteUserById);
 /**
  * @swagger
  * /api/auth/admin/dashboard:
