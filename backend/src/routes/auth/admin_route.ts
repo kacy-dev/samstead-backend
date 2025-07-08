@@ -1,4 +1,5 @@
 import express from 'express';
+import upload from '../../middlewares/multer_middleware';
 import {
   registerAdmin,
   verifyOTP,
@@ -7,7 +8,11 @@ import {
   getAllUsers,
   deleteUserById,
   getUserById,
-  updateUserById 
+  updateUserById,
+  createSettings,
+  getSettings,
+  updateSettings,
+  getSettingsById,
 } from '../../controllers/auth/admin_controller';
 import { protectAdmin } from '../../middlewares/auth_middleware';
 
@@ -126,6 +131,10 @@ router.get('/admin/users', getAllUsers);
 router.delete('/admin/users/:id', protectAdmin, deleteUserById);
 router.get('/admin/users/:id', protectAdmin, getUserById);
 router.patch("/admin/users/:id", protectAdmin, updateUserById);
+router.get('/admin/app-data', getSettings);
+router.get('/admin/app-data/:id', getSettingsById);
+router.post('/admin/app-data', protectAdmin, upload.single('appLogo'), createSettings);
+router.put('/admin/app-data/:id', protectAdmin, upload.single('appLogo'), updateSettings);
 /**
  * @swagger
  * /api/auth/admin/dashboard:

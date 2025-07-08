@@ -1,8 +1,10 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import cloudinary from '../../config/cloudinary_config';
 import Admin, { IAdmin } from '../../models/auth/Admin_model';
 import User, { IUser } from "../../models/auth/User_model";
+import AppSettings, { IAppSettings } from '../../models/auth/App_settings';
 import { generateOtp } from '../../utils/otp_generator';
 import { sendAdminRegistrationEmail } from '../../config/mailer_config';
 import { ERROR_CODES, STATUS_CODES } from '../../utils/error_codes';
@@ -12,6 +14,19 @@ import { ERROR_CODES, STATUS_CODES } from '../../utils/error_codes';
 //     expiresIn: '1d',
 //   });
 // };
+
+
+interface SettingsBody {
+  appName?: string;
+  description?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  contactEmail?: string;
+  officePhone?: string;
+  homePhone?: string;
+  whatsapp?: string;
+}
 
 const generateJWT = (
   adminId: string,
@@ -39,9 +54,9 @@ const isAccountLocked = (admin: IAdmin): boolean => {
 };
 
 export const registerAdmin = async (
-    req: Request, 
-    res: Response
-    ): Promise<void> => {
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { username, email, password } = req.body;
 
   try {
@@ -87,9 +102,9 @@ export const registerAdmin = async (
 };
 
 export const verifyOTP = async (
-    req: Request, 
-    res: Response
-    ): Promise<void> => {
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { email, otp } = req.body;
 
   try {
@@ -141,9 +156,9 @@ export const verifyOTP = async (
 };
 
 export const loginAdmin = async (
-    req: Request,
-    res: Response
-    ): Promise<void> => {
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { email, password } = req.body;
 
   try {
@@ -187,12 +202,12 @@ export const loginAdmin = async (
     await admin.save();
 
     const token = generateJWT(
-    admin._id.toString(),
-     admin.role,
-     admin.name,
-     admin.email,
-     admin.image
-     );
+      admin._id.toString(),
+      admin.role,
+      admin.name,
+      admin.email,
+      admin.image
+    );
 
     res.status(STATUS_CODES.OK).json({
       message: 'Login successful',
@@ -212,7 +227,7 @@ export const loginAdmin = async (
 export const getAllUsers = async (_req: Request, res: Response) => {
   try {
     const users = await User.find()
-      .populate('plan', 'name price features') 
+      .populate('plan', 'name price features')
       .sort({ createdAt: -1 });
 
     const formattedUsers = users.map((user) => ({
@@ -286,7 +301,7 @@ export const getUserById = async (
       });
     }
 
-    return res.status(200).json({ success: true, message: "User retreived successfully" , data: user});
+    return res.status(200).json({ success: true, message: "User retreived successfully", data: user });
   } catch (error) {
     console.error('Error fetching product by ID:', error);
     return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
@@ -353,7 +368,7 @@ export const updateUserById = async (req: Request, res: Response) => {
       data: updatedUser,
     });
 
-    
+
 
   } catch (err) {
     console.error("Update failed:", err);
@@ -364,11 +379,135 @@ export const updateUserById = async (req: Request, res: Response) => {
 };
 
 export const getAdminDashboard = async (
-    req: Request, 
-    res: Response
-    ): Promise<void> => {
+  req: Request,
+  res: Response
+): Promise<void> => {
   res.status(STATUS_CODES.OK).json({
     message: 'Welcome to the Admin dashboard',
     admin: req.admin,
   });
 };
+
+
+export const createSettings = async (
+  req: Request<{}, {}, SettingsBody>,
+  res: Response
+) => {
+  try {
+    const exists = await AppSettings.findOne();
+    if (exists) {
+      return res.status(400).json({
+        message: 'Settings already exist',
+        code: ERROR_CODES.VALIDATION_ERROR.code
+      });
+    }
+
+    let logoUrl: string | undefined;
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: 'app-settings',
+        use_filename: true,
+        unique_filename: false,
+      });
+      logoUrl = result.secure_url;
+    }
+
+    const settings = new AppSettings({
+      ...req.body,
+      appLogo: logoUrl
+    });
+
+    const saved = await settings.save();
+    return res.status(201).json({ message: 'App settings created', data: saved });
+
+  } catch (error) {
+    console.error('Create Settings Error:', error);
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+      message: ERROR_CODES.INTERNAL_ERROR.message,
+      code: ERROR_CODES.INTERNAL_ERROR.code
+    });
+  }
+};
+
+export const getSettings = async (_req: Request, res: Response) => {
+  try {
+    const settings = await AppSettings.findOne();
+    if (!settings) {
+      return res.status(404).json({ message: 'No app settings found' });
+    }
+
+    return res.status(200).json({ success: true, data: settings });
+  } catch (error) {
+    console.error('Fetch Settings Error:', error);
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+      message: ERROR_CODES.INTERNAL_ERROR.message,
+      code: ERROR_CODES.INTERNAL_ERROR.code
+    });
+  }
+};
+
+export const getSettingsById = async (
+  req: Request<{ id: string }>,
+  res: Response
+) => {
+  try {
+    const settings = await AppSettings.findById(req.params.id);
+    if (!settings) {
+      return res.status(STATUS_CODES.NOT_FOUND).json({
+        message: ERROR_CODES.NOT_FOUND.message,
+        code: ERROR_CODES.NOT_FOUND.code
+      });
+    }
+
+    return res.status(200).json({ success: true, data: settings });
+  } catch (error) {
+    console.error('Get Settings by ID Error:', error);
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+      message: ERROR_CODES.INTERNAL_ERROR.message,
+      code: ERROR_CODES.INTERNAL_ERROR.code
+    });
+  }
+};
+
+export const updateSettings = async (
+  req: Request<{ id: string }, {}, SettingsBody>,
+  res: Response
+) => {
+  try {
+    const { id } = req.params;
+    const existing = await AppSettings.findById(id);
+    if (!existing) {
+      return res.status(404).json({
+        message: 'Settings not found',
+        code: ERROR_CODES.NOT_FOUND.code
+      });
+    }
+
+    let logoUrl = existing.appLogo;
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: 'app-settings',
+        use_filename: true,
+        unique_filename: false,
+      });
+      logoUrl = result.secure_url;
+    }
+
+    Object.assign(existing, req.body);
+    if (logoUrl) existing.appLogo = logoUrl;
+
+    const updated = await existing.save();
+
+    return res.status(200).json({
+      message: 'App settings updated successfully',
+      data: updated
+    });
+  } catch (error) {
+    console.error('Update Settings Error:', error);
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+      message: ERROR_CODES.INTERNAL_ERROR.message,
+      code: ERROR_CODES.INTERNAL_ERROR.code
+    });
+  }
+};
+
