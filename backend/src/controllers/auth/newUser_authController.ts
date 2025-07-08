@@ -168,90 +168,90 @@ export const initializePayment = async (req: AuthedRequest, res: Response) => {
 };
 
 /* ________________ WebHook verification controller for all payments and authomatic update of the DB only on successful verifcation ____________ */
-export const paystackWebhook = async (req: Request, res: Response) => {
+// export const paystackWebhook = async (req: Request, res: Response) => {
 
-  const rawBody = JSON.stringify(req.body);
-  const signature = req.headers["x-paystack-signature"] as string;
-  const computed = crypto
-    .createHmac("sha512", process.env.PAYSTACK_SECRET as string)
-    .update(rawBody)
-    .digest("hex");
+//   const rawBody = JSON.stringify(req.body);
+//   const signature = req.headers["x-paystack-signature"] as string;
+//   const computed = crypto
+//     .createHmac("sha512", process.env.PAYSTACK_SECRET as string)
+//     .update(rawBody)
+//     .digest("hex");
 
-  if (computed !== signature) {
-    return res.status(STATUS_CODES.UNAUTHORIZED).json({
-      ...ERROR_CODES.UNAUTHORIZED_ACCESS,
-      success: false,
-    });
-  }
+//   if (computed !== signature) {
+//     return res.status(STATUS_CODES.UNAUTHORIZED).json({
+//       ...ERROR_CODES.UNAUTHORIZED_ACCESS,
+//       success: false,
+//     });
+//   }
 
-  const evt = req.body;
-  if (evt.event !== "charge.success" || evt.data.status !== "success") {
-    return res.sendStatus(200);
-  }
+//   const evt = req.body;
+//   if (evt.event !== "charge.success" || evt.data.status !== "success") {
+//     return res.sendStatus(200);
+//   }
 
-  try {
+//   try {
 
-    const verificationUrl = `https://api.paystack.co/transaction/verify/${evt.data.reference}`;
+//     const verificationUrl = `https://api.paystack.co/transaction/verify/${evt.data.reference}`;
 
-    const { data: verificationResponse } = await axios.get(verificationUrl, {
-      headers: { Authorization: `Bearer ${process.env.PAYSTACK_SECRET}` },
-    });
+//     const { data: verificationResponse } = await axios.get(verificationUrl, {
+//       headers: { Authorization: `Bearer ${process.env.PAYSTACK_SECRET}` },
+//     });
 
-    if (verificationResponse.data.status !== "success") {
-      return res.sendStatus(200);
-    }
+//     if (verificationResponse.data.status !== "success") {
+//       return res.sendStatus(200);
+//     }
 
-    /* ---------- Find user & plan ---------- */
-    const userId = evt.data.metadata?.userId;
-    const user = await User.findById(userId).populate<{ plan: IPlan }>("plan");
-    if (!user) {
-      return res.sendStatus(200);
-    }
+//     /* ---------- Find user & plan ---------- */
+//     const userId = evt.data.metadata?.userId;
+//     const user = await User.findById(userId).populate<{ plan: IPlan }>("plan");
+//     if (!user) {
+//       return res.sendStatus(200);
+//     }
 
-    /* ---------- Amount matching (convert DB naira → kobo) ---------- */
-    const amtKobo = evt.data.amount;                  // Paystack gives kobo
-    const monthlyKobo = user.plan.monthlyPrice * 100;     // DB stored in naira
-    const yearlyKobo = user.plan.yearlyPrice * 100;     // convert to kobo
+//     /* ---------- Amount matching (convert DB naira → kobo) ---------- */
+//     const amtKobo = evt.data.amount;                  // Paystack gives kobo
+//     const monthlyKobo = user.plan.monthlyPrice * 100;     // DB stored in naira
+//     const yearlyKobo = user.plan.yearlyPrice * 100;     // convert to kobo
 
-    let cycle: "monthly" | "yearly" | null = null;
-    if (amtKobo === monthlyKobo) cycle = "monthly";
-    else if (amtKobo === yearlyKobo) cycle = "yearly";
-    else {
-      return res.sendStatus(200);
-    }
+//     let cycle: "monthly" | "yearly" | null = null;
+//     if (amtKobo === monthlyKobo) cycle = "monthly";
+//     else if (amtKobo === yearlyKobo) cycle = "yearly";
+//     else {
+//       return res.sendStatus(200);
+//     }
 
-    /* ---------- Update user subscription ---------- */
-    const now = new Date();
-    const expires =
-      cycle === "monthly"
-        ? new Date(now.setMonth(now.getMonth() + 1))
-        : new Date(now.setFullYear(now.getFullYear() + 1));
+//     /* ---------- Update user subscription ---------- */
+//     const now = new Date();
+//     const expires =
+//       cycle === "monthly"
+//         ? new Date(now.setMonth(now.getMonth() + 1))
+//         : new Date(now.setFullYear(now.getFullYear() + 1));
 
-    user.status = "ACTIVE";
-    user.planCycle = cycle;
-    user.planExpiresAt = expires;
-    user.lastPayment = {
-      reference: evt.data.reference,
-      amount: amtKobo,             
-      paidAt: new Date(evt.data.paid_at),
-    } as any;
-    await user.save();
+//     user.status = "ACTIVE";
+//     user.planCycle = cycle;
+//     user.planExpiresAt = expires;
+//     user.lastPayment = {
+//       reference: evt.data.reference,
+//       amount: amtKobo,             
+//       paidAt: new Date(evt.data.paid_at),
+//     } as any;
+//     await user.save();
 
-    await PaymentLog.create({
-      user: user._id,
-      plan: user.plan._id,
-      amount: amtKobo,
-      cycle,
-      reference: evt.data.reference,
-      paidAt: new Date(evt.data.paid_at || evt.data.created_at),
-    });
+//     await PaymentLog.create({
+//       user: user._id,
+//       plan: user.plan._id,
+//       amount: amtKobo,
+//       cycle,
+//       reference: evt.data.reference,
+//       paidAt: new Date(evt.data.paid_at || evt.data.created_at),
+//     });
 
-    res.sendStatus(200);
-  } catch (err: any) {
-    console.error(" Webhook error:", err.response?.data || err);
-    res.sendStatus(500);
-  }
-};
+//     res.sendStatus(200);
+//   } catch (err: any) {
+//     console.error(" Webhook error:", err.response?.data || err);
+//     res.sendStatus(500);
+//   }
+// };
 
 
 export const loginUser = async (req: Request, res: Response) => {

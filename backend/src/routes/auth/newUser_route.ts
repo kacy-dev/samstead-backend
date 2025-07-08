@@ -4,7 +4,7 @@ import {
   loginUser,
   selectPlan,
   initializePayment,
-  paystackWebhook,
+  // paystackWebhook,
 } from '../../controllers/auth/newUser_authController';
 import { authGuard } from '../../middlewares/auth_Guard';
 
@@ -149,7 +149,7 @@ router.post('/payment/initialize', authGuard, initializePayment);
  *       200:
  *         description: Webhook processed
  */
-router.post('/payment/webhook', paystackWebhook);
+// router.post('/payment/webhook', paystackWebhook);
 
 
 export default router;

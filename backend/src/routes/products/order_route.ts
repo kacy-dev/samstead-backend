@@ -1,13 +1,14 @@
 import express from 'express';
 
-const {
+import {
   createOrder,
   getAllOrders,
   getOrderById,
+  getOrderByIdentifier,
   updateOrderStatus,
   cancelOrder,
   deleteOrder,
-} = require('../../controllers/products/order_controller');
+} from '../../controllers/products/order_controller';
 const { protectAdmin } = require('../../middlewares/auth_middleware');
 
 const router = express.Router();
@@ -114,7 +115,7 @@ router.post('/orders/create', createOrder);
  *       500:
  *         description: Internal server error
  */
-router.get('/orders/all-orders', protectAdmin, getAllOrders);
+router.get('/orders/all-orders', getAllOrders);
 
 /**
  * @swagger
@@ -142,7 +143,8 @@ router.get('/orders/all-orders', protectAdmin, getAllOrders);
  *       500:
  *         description: Internal server error
  */
-router.get('/orders/:id', protectAdmin, getOrderById);
+router.get('/orders/:id', getOrderById);
+// router.get('/orders/:identifier', getOrderByIdentifier);
 
 /**
  * @swagger
@@ -238,5 +240,4 @@ router.put('/orders/:id/cancel', protectAdmin, cancelOrder);
  *         description: Internal server error
  */
 router.delete('/orders/remove-order/:id', protectAdmin, deleteOrder);
-
-module.exports = router;
+export default router;

@@ -1,9 +1,18 @@
 import express from 'express';
+import upload from '../../middlewares/multer_middleware';
 import {
   registerAdmin,
   verifyOTP,
   loginAdmin,
-  getAdminDashboard
+  getAdminDashboard,
+  getAllUsers,
+  deleteUserById,
+  getUserById,
+  updateUserById,
+  createSettings,
+  getSettings,
+  updateSettings,
+  getSettingsById,
 } from '../../controllers/auth/admin_controller';
 import { protectAdmin } from '../../middlewares/auth_middleware';
 
@@ -104,6 +113,28 @@ router.post('/admin/verify-otp', verifyOTP);
  */
 router.post('/admin/login', loginAdmin);
 
+/**
+ * @swagger
+ * /api/auth/admin/dashboard:
+ *   get:
+ *     summary: Get admin dashboard (Protected)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Admin dashboard data retrieved
+ *       401:
+ *         description: Unauthorized
+ */
+router.get('/admin/users', getAllUsers);
+router.delete('/admin/users/:id', protectAdmin, deleteUserById);
+router.get('/admin/users/:id', protectAdmin, getUserById);
+router.patch("/admin/users/:id", protectAdmin, updateUserById);
+router.get('/admin/app-data', getSettings);
+router.get('/admin/app-data/:id', getSettingsById);
+router.post('/admin/app-data', protectAdmin, upload.single('appLogo'), createSettings);
+router.patch('/admin/app-data/:id', protectAdmin, upload.single('appLogo'), updateSettings);
 /**
  * @swagger
  * /api/auth/admin/dashboard:
