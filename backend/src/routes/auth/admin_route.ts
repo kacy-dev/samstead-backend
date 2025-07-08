@@ -5,7 +5,9 @@ import {
   loginAdmin,
   getAdminDashboard,
   getAllUsers,
-  deleteUserById
+  deleteUserById,
+  getUserById,
+  updateUserById 
 } from '../../controllers/auth/admin_controller';
 import { protectAdmin } from '../../middlewares/auth_middleware';
 
@@ -122,6 +124,8 @@ router.post('/admin/login', loginAdmin);
  */
 router.get('/admin/users', getAllUsers);
 router.delete('/admin/users/:id', protectAdmin, deleteUserById);
+router.get('/admin/users/:id', protectAdmin, getUserById);
+router.patch("/admin/users/:id", protectAdmin, updateUserById);
 /**
  * @swagger
  * /api/auth/admin/dashboard:

@@ -271,6 +271,98 @@ export const deleteUserById = async (req: Request, res: Response) => {
   }
 };
 
+export const getUserById = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { id } = req.params;
+
+    const user = await User.findById(id).select("-password");
+    if (!user) {
+      return res.status(STATUS_CODES.NOT_FOUND).json({
+        message: ERROR_CODES.USER_NOT_FOUND.message,
+        code: ERROR_CODES.USER_NOT_FOUND.code
+      });
+    }
+
+    return res.status(200).json({ success: true, message: "User retreived successfully" , data: user});
+  } catch (error) {
+    console.error('Error fetching product by ID:', error);
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+      message: ERROR_CODES.INTERNAL_ERROR.message,
+      code: ERROR_CODES.INTERNAL_ERROR.code
+    });
+  }
+};
+
+export const updateUserById = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.id;
+
+    const { name, email, status, tier } = req.body;
+
+    if (!name || !email || !status || !tier) {
+      return res.status(400).json({
+        message: "All fields (name, email, status, tier) are required.",
+      });
+    }
+
+    const nameParts = name.trim().split(" ");
+    const firstName = nameParts[0];
+    const lastName = nameParts.slice(1).join(" ") || "";
+
+    const statusMap: Record<string, "ACTIVE" | "INCOMPLETE" | "PLAN_SELECTED" | "EXPIRED"> = {
+      Active: "ACTIVE",
+      Inactive: "INCOMPLETE",
+      Pending: "PLAN_SELECTED",
+    };
+
+    const mappedStatus = statusMap[status];
+    if (!mappedStatus) {
+      return res.status(400).json({ message: "Invalid status value." });
+    }
+
+    const tierMap: Record<string, "monthly" | "yearly" | undefined> = {
+      Premium: "monthly",
+      Elite: "yearly",
+      Standard: undefined,
+    };
+
+    const planCycle = tierMap[tier];
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        firstName,
+        lastName,
+        email,
+        status: mappedStatus,
+        planCycle,
+      },
+      { new: true }
+    ).select("-password");
+    console.log(updatedUser);
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    return res.status(200).json({
+      message: "User updated successfully",
+      data: updatedUser,
+    });
+
+    
+
+  } catch (err) {
+    console.error("Update failed:", err);
+    return res.status(500).json({
+      ...ERROR_CODES.INTERNAL_ERROR,
+    });
+  }
+};
+
 export const getAdminDashboard = async (
     req: Request, 
     res: Response
