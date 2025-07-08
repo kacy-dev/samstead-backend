@@ -119,7 +119,7 @@ router.post('/admin/login', loginAdmin);
  *       401:
  *         description: Unauthorized
  */
-router.get('/admin/users', protectAdmin, getAllUsers);
+router.get('/admin/users', getAllUsers);
 /**
  * @swagger
  * /api/auth/admin/dashboard:
