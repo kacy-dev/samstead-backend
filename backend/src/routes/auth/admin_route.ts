@@ -133,8 +133,8 @@ router.get('/admin/users/:id', protectAdmin, getUserById);
 router.patch("/admin/users/:id", protectAdmin, updateUserById);
 router.get('/admin/app-data', getSettings);
 router.get('/admin/app-data/:id', getSettingsById);
-router.patch('/admin/app-data', protectAdmin, upload.single('appLogo'), createSettings);
-router.put('/admin/app-data/:id', protectAdmin, upload.single('appLogo'), updateSettings);
+router.post('/admin/app-data', protectAdmin, upload.single('appLogo'), createSettings);
+router.patch('/admin/app-data/:id', protectAdmin, upload.single('appLogo'), updateSettings);
 /**
  * @swagger
  * /api/auth/admin/dashboard:
